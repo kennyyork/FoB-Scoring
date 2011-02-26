@@ -11,13 +11,13 @@ namespace Scoring
 {
     public partial class Form1 : Form
     {
-        BindingList<Person> people = new BindingList<Person>();
+        List<Person> people = new List<Person>();
         Person activePerson = null;
         int active = 0;
         public Form1()
         {
             InitializeComponent();
-            //people.Add(new Person { FirstName = "Kenny", LastName = "York" });
+            people.Add(new Person { FirstName = "Kenny", LastName = "York" });
             //people.Add(new Person { FirstName = "Kacey", LastName = "York" });
             //people.Add(new Person { FirstName = "Doug", LastName = "Porter" });
             //people.Add(new Person { FirstName = "Casey", LastName = "Kuluz" });
@@ -33,26 +33,32 @@ namespace Scoring
 
         private void btnNext_Click(object sender, EventArgs e)
         {
-            
+            ++active;
+            UpdateUI();
         }
 
         private void Form1_Load(object sender, EventArgs e)
-        {
-            //load existing
-
-            //txtFirst.DataBindings.Add("Text", people[0], "FirstName");
-            //txtLast.DataBindings.Add("Text", people[0], "LastName");
-            //people.AllowEdit = false;    
+        {            
+            //load existing            
             activePerson = new Person();
+            active = 0;
             txtFirst.DataBindings.Add("Text", activePerson, "FirstName");
             txtLast.DataBindings.Add("Text", activePerson, "LastName");
 
-            Update();
+            UpdateUI();
+
+            Score s1 = new Score { TeamName = "s1" };
+            Score s2 = new Score { TeamName = "s2" };
+            Score s3 = new Score { TeamName = "s3" };
+            Score s4 = new Score { TeamName = "s4" };
+
+            scoringInput1.SetScores(s1,s2,s3,s4);
         }
 
         private void btnPrev_Click(object sender, EventArgs e)
         {
-            
+            --active;
+            UpdateUI();
         }
 
         private void btnEdit_Click(object sender, EventArgs e)
@@ -63,32 +69,41 @@ namespace Scoring
             }
             else
             {
-                //EditCurrent();
+                EditCurrent();
             }
         }
 
         private void AddNew()
         {
-            people.Add(activePerson);
+            //validate input
+
+            //make a copy
+            Person p = new Person(activePerson);
+            people.Add(p);            
             ++active;
-            Update();
+
+            UpdateUI();
         }
 
-        private void Update()
+        private void EditCurrent()
+        {
+            people[active].Update(activePerson);
+            UpdateUI();
+        }
+
+        private void UpdateUI()
         {
             btnPrev.Enabled = (active > 0);
-            btnNext.Enabled = (active < (people.Count-1));
+            btnNext.Enabled = (active < (people.Count));
 
-            if (active >= 0 && active < (people.Count - 1))
+            if (active >= 0 && active < (people.Count))
             {
-                activePerson = new Person { FirstName = people[active].FirstName, LastName = people[active].LastName };
+                activePerson.Update(people[active]);
             }
             else
             {
-                activePerson = new Person();
-            }
-
-            ((PropertyManager)this.BindingContext[activePerson]).ResumeBinding();
+                activePerson.Default();
+            }            
 
             if (active == people.Count)
             {
@@ -101,9 +116,65 @@ namespace Scoring
         }
     }
 
-    public class Person
+    public class Person : INotifyPropertyChanged
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
+        private string fName;
+        private string lName;
+
+        public string FirstName 
+        {
+            get { return fName; }
+            set
+            {
+                fName = value;
+                NotifyPropertyChanged("FirstName");
+            }
+        }
+        public string LastName
+        {
+            get { return lName; }
+            set
+            {
+                lName = value;
+                NotifyPropertyChanged("LastName");
+            }
+        }
+
+        public Person()
+        {
+            Default();
+        }
+
+        public Person(Person source)
+        {
+            Update(source);
+        }
+
+        public void Update(Person source)
+        {
+            this.FirstName = source.FirstName;
+            this.LastName = source.LastName;
+        }
+
+        public void Default()
+        {
+            this.FirstName = string.Empty;
+            this.LastName = string.Empty;
+        }
+
+        #region INotifyPropertyChanged Members
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void NotifyPropertyChanged(string name)
+        {
+            PropertyChangedEventHandler evt = PropertyChanged;
+            if( evt != null )
+            {
+                evt(this, new PropertyChangedEventArgs(name));
+            }
+        }
+
+        #endregion
     }
 }

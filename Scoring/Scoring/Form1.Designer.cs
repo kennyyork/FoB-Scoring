@@ -33,6 +33,7 @@
             this.txtFirst = new System.Windows.Forms.TextBox();
             this.txtLast = new System.Windows.Forms.TextBox();
             this.btnEdit = new System.Windows.Forms.Button();
+            this.scoringInput1 = new Scoring.ScoringInput();
             this.SuspendLayout();
             // 
             // btnPrev
@@ -81,11 +82,19 @@
             this.btnEdit.UseVisualStyleBackColor = true;
             this.btnEdit.Click += new System.EventHandler(this.btnEdit_Click);
             // 
+            // scoringInput1
+            // 
+            this.scoringInput1.Location = new System.Drawing.Point(212, 12);
+            this.scoringInput1.Name = "scoringInput1";
+            this.scoringInput1.Size = new System.Drawing.Size(650, 180);
+            this.scoringInput1.TabIndex = 5;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(177, 96);
+            this.ClientSize = new System.Drawing.Size(1166, 553);
+            this.Controls.Add(this.scoringInput1);
             this.Controls.Add(this.btnEdit);
             this.Controls.Add(this.txtLast);
             this.Controls.Add(this.txtFirst);
@@ -106,6 +115,7 @@
         private System.Windows.Forms.TextBox txtFirst;
         private System.Windows.Forms.TextBox txtLast;
         private System.Windows.Forms.Button btnEdit;
+        private ScoringInput scoringInput1;
     }
 }
 
