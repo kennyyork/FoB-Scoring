@@ -10,6 +10,7 @@ namespace Scoring
     {
         public string Name { get; private set; }
         public int Number { get; private set; }
+        public int LastRound { get; set; }
         public double Notebook { get; set; }
 
         private List<Score> scores;
@@ -23,6 +24,17 @@ namespace Scoring
 
             scores = new List<Score>();
             rounds = new List<Round>();
+        }
+
+        public void AddScore(Score score)
+        {
+            scores.Add(score);
+            LastRound = score.Round.Number;
+        }
+
+        public void AddRound(Round round)
+        {
+
         }
 
         public override string ToString()

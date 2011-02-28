@@ -30,6 +30,11 @@ namespace Scoring
             Green = green;
             Blue = blue;
             Yellow = yellow;
+
+            red.AddRound(this);
+            green.AddRound(this);
+            blue.AddRound(this);
+            yellow.AddRound(this);
         }
 
         public override string ToString()

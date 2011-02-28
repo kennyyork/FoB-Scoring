@@ -51,6 +51,7 @@
             this.btnPrelim.TabIndex = 6;
             this.btnPrelim.Text = "Generate Prelim";
             this.btnPrelim.UseVisualStyleBackColor = true;
+            this.btnPrelim.Click += new System.EventHandler(this.btnPrelim_Click);
             // 
             // btnWildcard
             // 

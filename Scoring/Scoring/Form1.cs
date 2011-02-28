@@ -37,7 +37,14 @@ namespace Scoring
             CenterNud();
 
             //load existing            
-            LoadFile();
+            try
+            {
+                LoadFile();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
 
             if (scores.Count > 0)
             {
@@ -81,17 +88,24 @@ namespace Scoring
             teams.Clear();
             rounds.Clear();
             scores.Clear();
-
+            
+            StreamReader sr;
+            string line;
+            
             try
-            {
-                StreamReader sr;
-                string line;
-
+            {                
                 //read global game 
                 line = File.ReadAllText(GAME_FILE_PATH);
                 string[] split = line.Split(',');
                 roundsPerTeam = int.Parse(split[0]);                
+            }
+            catch
+            {
+                throw;
+            }
 
+            try
+            {
                 //read teams 
                 sr = File.OpenText(TEAM_FILE_PATH);
                 while( (line = sr.ReadLine()) != null )
@@ -99,16 +113,32 @@ namespace Scoring
                     teams.Add(Team.FromString(line));                          
                 }
                 sr.Close();
+            }
+            catch
+            {
+                teams.Clear();
+                throw;
+            }
+                
+            prelimCount = (roundsPerTeam * teams.Count) / 4;
 
-                prelimCount = (roundsPerTeam * teams.Count) / 4;
-
+            try
+            {
                 sr = File.OpenText(ROUNDS_FILE_PATH);
                 while ((line = sr.ReadLine()) != null)
                 {
                     rounds.Add(Round.FromString(teams,line));
                 }
                 sr.Close();
+            }
+            catch
+            {                
+                rounds.Clear();
+                throw;
+            }
 
+            try
+            {
                 sr = File.OpenText(SCORES_FILE_PATH);
                 while ((line = sr.ReadLine()) != null)
                 {
@@ -118,10 +148,8 @@ namespace Scoring
             }
             catch (Exception ex)
             {
-                teams.Clear();
-                rounds.Clear();
                 scores.Clear();
-                MessageBox.Show(ex.Message);
+                throw;
             }
         }
         //if (File.Exists(TEAM_FILE_PATH))
@@ -165,9 +193,95 @@ namespace Scoring
             pnlScoreIn.Top = offsetY;
         }
 
-        public static List<Round> GenerateSeeding(List<Team> teams, int gamesPerTeam, bool backToBack)
+        private List<Round> GenerateSeeding(List<Team> teams, int gamesPerTeam, bool backToBack)
         {
-            return null;
+            //generate a random list of all teams
+            //select 4 teams from that list wher not in last round
+              //if 4 not available, re-add all teams and select where 1) not in current set and 2) not in last round
+                //if 4 not available, select any needed
+
+            List<Round> rounds = new List<Round>();
+            int required = (teams.Count * gamesPerTeam) / 4;
+
+            while (rounds.Count < required)
+            {                   
+                List<Team> availTeams = teams.Shuffle();
+                List<Team> set = availTeams.TakeAndRemove(4, t => t.LastRound != rounds.Count - 1);
+                if (set.Count < 4)
+                {
+                    availTeams = teams.Shuffle();
+                    set.AddRange(availTeams.TakeAndRemove(4 - set.Count, t => (t.LastRound != rounds.Count - 1) && !set.Contains(t)));
+
+                    if (set.Count < 4)
+                    {
+                        if (!backToBack)
+                        {
+                            throw new InvalidOperationException("unable to generate a seeding with the provided inputs");
+                        }
+
+                        set.AddRange(availTeams.TakeAndRemove(4 - set.Count, t => !set.Contains(t)));
+                        if (set.Count < 4)
+                        {
+                            throw new InvalidOperationException("unable to generate a seeding with the provided inputs");
+                        }
+                    }
+                }
+
+                Round r = new Round(rounds.Count + 1, Round.Types.Preliminary, set[0], set[1], set[2], set[3]);
+                rounds.Add(r);
+            }
+
+
+            return rounds;
+        }
+
+        private void btnPrelim_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                rounds = GenerateSeeding(teams, roundsPerTeam, false);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+    }
+
+    public static class Extensions
+    {
+        public static List<T> Shuffle<T>(this List<T> list)
+        {
+            List<T> temp = list.ToList();
+
+            Random rng = new Random();
+            int n = temp.Count;
+            while (n > 1)
+            {
+                int k = rng.Next(n);
+                --n;
+                T value = temp[k];
+                temp[k] = temp[n];
+                temp[n] = value;
+            }
+
+            return temp;
+        }
+
+        public static List<T> TakeAndRemove<T>(this List<T> source, int count, Func<T, bool> predicate)
+        {
+            List<T> result = new List<T>();
+            for (int i = 0; i < source.Count && result.Count < count; ++i)
+            {
+                if (predicate(source[i]))
+                {
+                    result.Add(source[i]);
+                    source.RemoveAt(i);
+                    continue;
+                }
+            }
+
+            return result;
         }
     }
 }
