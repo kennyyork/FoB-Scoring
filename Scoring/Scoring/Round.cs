@@ -62,10 +62,5 @@ namespace Scoring
                 throw;
             }
         }
-
-        public static void GenerateSeeding(List<Team> teams, int gamesPerTeam, bool backToBack)
-        {
-
-        }
     }
 }

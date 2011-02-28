@@ -34,10 +34,13 @@
             this.btnFinals = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.btnNotebook = new System.Windows.Forms.Button();
-            this.scoringInput1 = new Scoring.ScoringInput();
             this.nudRound = new System.Windows.Forms.NumericUpDown();
+            this.scoringInput1 = new Scoring.ScoringInput();
+            this.pnlScoreIn = new System.Windows.Forms.Panel();
+            this.button1 = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudRound)).BeginInit();
+            this.pnlScoreIn.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnPrelim
@@ -98,28 +101,45 @@
             this.btnNotebook.Text = "Enter Notebooks";
             this.btnNotebook.UseVisualStyleBackColor = true;
             // 
+            // nudRound
+            // 
+            this.nudRound.Location = new System.Drawing.Point(3, 3);
+            this.nudRound.Name = "nudRound";
+            this.nudRound.Size = new System.Drawing.Size(62, 20);
+            this.nudRound.TabIndex = 13;
+            this.nudRound.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
             // scoringInput1
             // 
             this.scoringInput1.Location = new System.Drawing.Point(12, 12);
             this.scoringInput1.Name = "scoringInput1";
             this.scoringInput1.Size = new System.Drawing.Size(650, 180);
             this.scoringInput1.TabIndex = 5;
-            this.scoringInput1.Visible = false;
             // 
-            // nudRound
+            // pnlScoreIn
             // 
-            this.nudRound.Location = new System.Drawing.Point(304, 206);
-            this.nudRound.Name = "nudRound";
-            this.nudRound.Size = new System.Drawing.Size(62, 20);
-            this.nudRound.TabIndex = 13;
-            this.nudRound.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.pnlScoreIn.Controls.Add(this.button1);
+            this.pnlScoreIn.Controls.Add(this.nudRound);
+            this.pnlScoreIn.Location = new System.Drawing.Point(162, 309);
+            this.pnlScoreIn.Name = "pnlScoreIn";
+            this.pnlScoreIn.Size = new System.Drawing.Size(132, 26);
+            this.pnlScoreIn.TabIndex = 14;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(71, 3);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(58, 20);
+            this.button1.TabIndex = 14;
+            this.button1.Text = "Enter";
+            this.button1.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(787, 553);
-            this.Controls.Add(this.nudRound);
+            this.Controls.Add(this.pnlScoreIn);
             this.Controls.Add(this.btnNotebook);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.scoringInput1);
@@ -130,6 +150,7 @@
             this.Load += new System.EventHandler(this.Form1_Load);
             this.groupBox1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.nudRound)).EndInit();
+            this.pnlScoreIn.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -144,6 +165,8 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Button btnNotebook;
         private System.Windows.Forms.NumericUpDown nudRound;
+        private System.Windows.Forms.Panel pnlScoreIn;
+        private System.Windows.Forms.Button button1;
     }
 }
 

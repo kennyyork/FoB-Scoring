@@ -17,9 +17,20 @@ namespace Scoring
             InitializeComponent();            
         }
 
+        private const string GAME_FILE_PATH = "game.txt";
         private const string TEAM_FILE_PATH = "teams.txt";
         private const string SCORES_FILE_PATH = "scores.txt";
-        private const string ROUNDS_FILE_PATH = "rounds.txt";        
+        private const string ROUNDS_FILE_PATH = "rounds.txt";
+
+        private int activeRound = 0;
+        private int roundsPerTeam = 0;       
+
+        private int prelimCount = 0;
+        private const int WILDCARD_COUNT = 1;
+        private const int SEMIFINAL_COUNT = 8;
+        private const int FINAL_COUNT = 8;
+
+        private Round.Types gameState = Round.Types.Semifinals;
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -28,13 +39,31 @@ namespace Scoring
             //load existing            
             LoadFile();
 
+            if (scores.Count > 0)
+            {
+                activeRound = scores.Max(s => s.Round.Number);
+            }
+
+            if (activeRound == 0)
+            {
+                pnlScoreIn.Enabled = false;
+            }
+            else
+            {
+                pnlScoreIn.Enabled = true;
+                nudRound.Minimum = 0;
+                nudRound.Maximum = activeRound;
+            }
+           
             UpdateUI();            
         }
 
-
+        bool wildcardEntered = false;
         private void UpdateUI()
-        {
-           
+        {            
+            btnWildcard.Enabled = (activeRound >= prelimCount) && wildcardEntered;
+            btnSemi.Enabled = (activeRound >= (prelimCount + WILDCARD_COUNT));
+            btnFinals.Enabled = (activeRound >= (prelimCount + WILDCARD_COUNT + SEMIFINAL_COUNT));
         }
 
         private List<Team> teams = new List<Team>();
@@ -58,6 +87,11 @@ namespace Scoring
                 StreamReader sr;
                 string line;
 
+                //read global game 
+                line = File.ReadAllText(GAME_FILE_PATH);
+                string[] split = line.Split(',');
+                roundsPerTeam = int.Parse(split[0]);                
+
                 //read teams 
                 sr = File.OpenText(TEAM_FILE_PATH);
                 while( (line = sr.ReadLine()) != null )
@@ -65,6 +99,8 @@ namespace Scoring
                     teams.Add(Team.FromString(line));                          
                 }
                 sr.Close();
+
+                prelimCount = (roundsPerTeam * teams.Count) / 4;
 
                 sr = File.OpenText(ROUNDS_FILE_PATH);
                 while ((line = sr.ReadLine()) != null)
@@ -79,7 +115,6 @@ namespace Scoring
                     scores.Add(Score.FromString(teams,rounds,line));
                 }
                 sr.Close();
-
             }
             catch (Exception ex)
             {
@@ -123,11 +158,16 @@ namespace Scoring
 
         private void CenterNud()
         {
-            int offsetX = scoringInput1.Left + (scoringInput1.Width / 2 ) - (nudRound.Width / 2);
+            int offsetX = scoringInput1.Left + (scoringInput1.Width / 2 ) - (pnlScoreIn.Width / 2);
             int offsetY = scoringInput1.Top + scoringInput1.Height + 5;
 
-            nudRound.Left = offsetX;
-            nudRound.Top = offsetY;
+            pnlScoreIn.Left = offsetX;
+            pnlScoreIn.Top = offsetY;
+        }
+
+        public static List<Round> GenerateSeeding(List<Team> teams, int gamesPerTeam, bool backToBack)
+        {
+            return null;
         }
     }
 }
