@@ -6,175 +6,128 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.IO;
 
 namespace Scoring
 {
     public partial class Form1 : Form
     {
-        List<Person> people = new List<Person>();
-        Person activePerson = null;
-        int active = 0;
         public Form1()
         {
-            InitializeComponent();
-            people.Add(new Person { FirstName = "Kenny", LastName = "York" });
-            //people.Add(new Person { FirstName = "Kacey", LastName = "York" });
-            //people.Add(new Person { FirstName = "Doug", LastName = "Porter" });
-            //people.Add(new Person { FirstName = "Casey", LastName = "Kuluz" });
-            
-            
-            //people.ListChanged += new ListChangedEventHandler(people_ListChanged);
+            InitializeComponent();            
         }
 
-        void people_ListChanged(object sender, ListChangedEventArgs e)
-        {
-            
-        }
-
-        private void btnNext_Click(object sender, EventArgs e)
-        {
-            ++active;
-            UpdateUI();
-        }        
+        private const string TEAM_FILE_PATH = "teams.txt";
+        private const string SCORES_FILE_PATH = "scores.txt";
+        private const string ROUNDS_FILE_PATH = "rounds.txt";        
 
         private void Form1_Load(object sender, EventArgs e)
-        {            
+        {
+            CenterNud();
+
             //load existing            
-            activePerson = new Person();
-            active = 0;
-            txtFirst.DataBindings.Add("Text", activePerson, "FirstName");
-            txtLast.DataBindings.Add("Text", activePerson, "LastName");
+            LoadFile();
 
-            UpdateUI();
-
-            //Score s1 = new Score { TeamName = "a really really long team name" };
-            //Score s2 = new Score { TeamName = "s2" };
-            //Score s3 = new Score { TeamName = "s3" };
-            //Score s4 = new Score { TeamName = "s4" };
-
-            //scoringInput1.SetScores(s1,s2,s3,s4);
+            UpdateUI();            
         }
 
-        private void btnPrev_Click(object sender, EventArgs e)
-        {
-            --active;
-            UpdateUI();
-        }
-
-        private void btnEdit_Click(object sender, EventArgs e)
-        {
-            if (btnEdit.Text == "Add")
-            {
-                AddNew();
-            }
-            else
-            {
-                EditCurrent();
-            }
-        }
-
-        private void AddNew()
-        {
-            //validate input
-
-            //make a copy
-            Person p = new Person(activePerson);
-            people.Add(p);            
-            ++active;
-
-            UpdateUI();
-        }
-
-        private void EditCurrent()
-        {
-            people[active].Update(activePerson);
-            UpdateUI();
-        }
 
         private void UpdateUI()
         {
-            btnPrev.Enabled = (active > 0);
-            btnNext.Enabled = (active < (people.Count));
+           
+        }
 
-            if (active >= 0 && active < (people.Count))
+        private List<Team> teams = new List<Team>();
+        private List<Round> rounds = new List<Round>();
+        private List<Score> scores = new List<Score>();
+
+        private void LoadFile()
+        {
+            if (teams.Count > 0)
             {
-                activePerson.Update(people[active]);
+                DialogResult dr = MessageBox.Show("All current data will be lost, continue?", "Caution", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+                if (dr == DialogResult.Cancel) return;
             }
-            else
-            {
-                activePerson.Default();
-            }            
 
-            if (active == people.Count)
+            teams.Clear();
+            rounds.Clear();
+            scores.Clear();
+
+            try
             {
-                btnEdit.Text = "Add";
+                StreamReader sr;
+                string line;
+
+                //read teams 
+                sr = File.OpenText(TEAM_FILE_PATH);
+                while( (line = sr.ReadLine()) != null )
+                {
+                    teams.Add(Team.FromString(line));                          
+                }
+                sr.Close();
+
+                sr = File.OpenText(ROUNDS_FILE_PATH);
+                while ((line = sr.ReadLine()) != null)
+                {
+                    rounds.Add(Round.FromString(teams,line));
+                }
+                sr.Close();
+
+                sr = File.OpenText(SCORES_FILE_PATH);
+                while ((line = sr.ReadLine()) != null)
+                {
+                    scores.Add(Score.FromString(teams,rounds,line));
+                }
+                sr.Close();
+
             }
-            else
+            catch (Exception ex)
             {
-                btnEdit.Text = "Edit";
+                teams.Clear();
+                rounds.Clear();
+                scores.Clear();
+                MessageBox.Show(ex.Message);
             }
         }
-    }
-
-    public class Person : INotifyPropertyChanged
-    {
-        private string fName;
-        private string lName;
-
-        public string FirstName 
+        //if (File.Exists(TEAM_FILE_PATH))
+        //    {
+        //        DialogResult dr = MessageBox.Show("File exists, overwrite?", "Caution", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+        //        if (dr == DialogResult.Cancel) return;
+        //    }
+        private void WriteTeams()
         {
-            get { return fName; }
-            set
+            StreamWriter sw = new StreamWriter(File.OpenWrite(TEAM_FILE_PATH));
+            foreach (var t in teams)
             {
-                fName = value;
-                NotifyPropertyChanged("FirstName");
-            }
-        }
-        public string LastName
-        {
-            get { return lName; }
-            set
-            {
-                lName = value;
-                NotifyPropertyChanged("LastName");
-            }
-        }
-
-        public Person()
-        {
-            Default();
-        }
-
-        public Person(Person source)
-        {
-            Update(source);
-        }
-
-        public void Update(Person source)
-        {
-            this.FirstName = source.FirstName;
-            this.LastName = source.LastName;
-        }
-
-        public void Default()
-        {
-            this.FirstName = string.Empty;
-            this.LastName = string.Empty;
-        }
-
-        #region INotifyPropertyChanged Members
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public void NotifyPropertyChanged(string name)
-        {
-            PropertyChangedEventHandler evt = PropertyChanged;
-            if( evt != null )
-            {
-                evt(this, new PropertyChangedEventArgs(name));
+                sw.WriteLine(t);
             }
         }
 
-        #endregion
+        private void WriteRounds()
+        {
+            StreamWriter sw = new StreamWriter(File.OpenWrite(ROUNDS_FILE_PATH));
+            foreach (var t in rounds)
+            {
+                sw.WriteLine(t);
+            }
+        }
+
+        private void WriteScores()
+        {
+            StreamWriter sw = new StreamWriter(File.OpenWrite(SCORES_FILE_PATH));
+            foreach (var t in scores)
+            {
+                sw.WriteLine(t);
+            }
+        }
+
+        private void CenterNud()
+        {
+            int offsetX = scoringInput1.Left + (scoringInput1.Width / 2 ) - (nudRound.Width / 2);
+            int offsetY = scoringInput1.Top + scoringInput1.Height + 5;
+
+            nudRound.Left = offsetX;
+            nudRound.Top = offsetY;
+        }
     }
 }

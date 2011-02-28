@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 
 namespace Scoring
 {
@@ -19,6 +20,7 @@ namespace Scoring
         private const int COAL_POINTS = 20;
 
         public Team Team { get; private set; }
+        public Round Round { get; private set; }
 
         public int Markers { get; set; }
         public int CarsGood { get; set; }
@@ -36,10 +38,11 @@ namespace Scoring
             return result;
         }
 
-        public Score(Team team)
+        public Score(Team team, Round round)
         {
             this.Team = team;
             Multiplier = 1.0f;
+            Round = round;
         }
 
         public Score(Score score)
@@ -54,5 +57,57 @@ namespace Scoring
             CoalBad = score.CoalBad;
             Multiplier = score.Multiplier;
         }
+
+        public override string ToString()
+        {
+            return string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9:0.0}", Team.Number, Round.Number, Markers, CarsGood, CarsBad, LogsGood, LogsBad, CoalGood, CoalBad, Multiplier);
+        }
+
+        public static Score FromString(List<Team> teams, List<Round> rounds, string line)
+        {
+            string[] split = line.Split(',');
+
+            Team t1 = teams.Single(t => t.Number == int.Parse(split[0]));
+            Round r1 = rounds.Single( r => r.Number == int.Parse(split[1]));
+
+            Score s = new Score(t1, r1);
+            s.Markers = int.Parse(split[2]);
+            s.CarsGood = int.Parse(split[3]);
+            s.CarsBad = int.Parse(split[4]);
+            s.LogsGood = int.Parse(split[5]);
+            s.LogsBad = int.Parse(split[6]);
+            s.CoalGood = int.Parse(split[7]);
+            s.CoalBad = int.Parse(split[8]);
+            s.Multiplier = double.Parse(split[9]);
+
+            return s;
+        }
+
+        //public static List<Score> ReadAll(string path)
+        //{
+        //    if (!File.Exists(path))
+        //    {
+        //        return null;
+        //    }
+
+        //    List<Score> teams = new List<Score>();
+
+        //    try
+        //    {
+        //        StreamReader sr = File.OpenText(path);
+        //        string line;
+        //        while ((line = sr.ReadLine()) != null)
+        //        {
+        //            string[] split = line.Split(',');
+        //            //round,team,scores...
+        //        }
+        //    }
+        //    catch
+        //    {
+        //        throw;
+        //    }
+
+        //    return teams;
+        //}
     }
 }

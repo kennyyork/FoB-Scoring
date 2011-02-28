@@ -10,6 +10,7 @@ namespace Scoring
     {
         public string Name { get; private set; }
         public int Number { get; private set; }
+        public double Notebook { get; set; }
 
         private List<Score> scores;
         private List<Round> rounds;
@@ -18,42 +19,67 @@ namespace Scoring
         {
             Name = name;
             Number = number;
+            Notebook = 0;
 
             scores = new List<Score>();
             rounds = new List<Round>();
         }
 
-        public static List<Team> ReadAll(string path)
+        public override string ToString()
         {
-            if (!File.Exists(path))
-            {
-                return null;
-            }
+            return string.Format("{0},{1}", Number, Name);
+        }
 
-            List<Team> teams = new List<Team>();
+        public static Team FromString(string line)
+        {
+            string[] split = line.Split(',');
+            Team t = new Team(split[1], int.Parse(split[0]));
+            return t;
+        }
 
-            try
-            {                
-                StreamReader sr = File.OpenText(path);
-                string line;
-                while ((line = sr.ReadLine()) != null)
-                {
-                    string[] split = line.Split(',');
-                    Team t = new Team(split[1], int.Parse(split[0]));
-                    teams.Add(t);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw;
-            }
+        //public static List<Team> ReadAll(string path)
+        //{
+        //    if (!File.Exists(path))
+        //    {
+        //        return null;
+        //    }
+
+        //    List<Team> teams = new List<Team>();
+
+        //    try
+        //    {                
+        //        StreamReader sr = File.OpenText(path);
+        //        string line;
+        //        while ((line = sr.ReadLine()) != null)
+        //        {
+        //            string[] split = line.Split(',');
+        //            Team t = new Team(split[1], int.Parse(split[0]));
+        //            teams.Add(t);
+        //        }
+        //    }
+        //    catch
+        //    {
+        //        throw;
+        //    }
             
-            return teams;
-        }
+        //    return teams;
+        //}
 
-        public static void WriteAll(string path, IEnumerable<Team> teams)
-        {
-
-        }
+        //public static void WriteAll(string path, IEnumerable<Team> teams)
+        //{
+        //    try
+        //    {
+        //        var fs = File.OpenWrite(path);
+        //        StreamWriter sr = new StreamWriter(fs);
+        //        foreach (var t in teams)
+        //        {
+        //            sr.WriteLine("{0},{1}", t.Number, t.Name);
+        //        }
+        //    }
+        //    catch
+        //    {
+        //        throw;
+        //    }            
+        //}
     }
 }
