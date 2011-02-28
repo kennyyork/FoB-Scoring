@@ -80,6 +80,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Round.cs" />
     <Compile Include="Score.cs" />
     <Compile Include="ScoringInput.cs">
       <SubType>UserControl</SubType>
@@ -87,6 +88,7 @@
     <Compile Include="ScoringInput.Designer.cs">
       <DependentUpon>ScoringInput.cs</DependentUpon>
     </Compile>
+    <Compile Include="Team.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

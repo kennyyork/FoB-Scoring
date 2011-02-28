@@ -35,7 +35,7 @@ namespace Scoring
         {
             ++active;
             UpdateUI();
-        }
+        }        
 
         private void Form1_Load(object sender, EventArgs e)
         {            
@@ -47,12 +47,12 @@ namespace Scoring
 
             UpdateUI();
 
-            Score s1 = new Score { TeamName = "s1" };
-            Score s2 = new Score { TeamName = "s2" };
-            Score s3 = new Score { TeamName = "s3" };
-            Score s4 = new Score { TeamName = "s4" };
+            //Score s1 = new Score { TeamName = "a really really long team name" };
+            //Score s2 = new Score { TeamName = "s2" };
+            //Score s3 = new Score { TeamName = "s3" };
+            //Score s4 = new Score { TeamName = "s4" };
 
-            scoringInput1.SetScores(s1,s2,s3,s4);
+            //scoringInput1.SetScores(s1,s2,s3,s4);
         }
 
         private void btnPrev_Click(object sender, EventArgs e)

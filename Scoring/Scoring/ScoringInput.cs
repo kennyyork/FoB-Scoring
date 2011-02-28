@@ -17,7 +17,7 @@ namespace Scoring
         }
 
         private List<Label> lblTeams = new List<Label>();
-        private List<Label> lblScores = new List<Label>();
+        private List<Label> lblScores = new List<Label>();                
         private List<ComboBox> cbMarkers = new List<ComboBox>();
         private List<ComboBox> cbCarsGood = new List<ComboBox>();
         private List<ComboBox> cbCarsBad = new List<ComboBox>();
@@ -25,26 +25,46 @@ namespace Scoring
         private List<ComboBox> cbLogsBad = new List<ComboBox>();
         private List<ComboBox> cbCoalGood = new List<ComboBox>();
         private List<ComboBox> cbCoalBad = new List<ComboBox>();
-        private List<ComboBox> cbMultiplier = new List<ComboBox>();        
+        private List<ComboBox> cbMultiplier = new List<ComboBox>();
+
+        private bool modified = false;
+        Score[] scores;
 
         public void SetScores(Score team1, Score team2, Score team3, Score team4)
         {
-            Score[] test = new Score[] { team1, team2, team3, team4 };
+            scores = new Score[] { team1, team2, team3, team4 };
 
             for (int i = 0; i < 4; ++i)
             {
-                lblTeams[i].Text = test[i].TeamName;
+                lblTeams[i].Text = scores[i].Team.Name;
+                                
+                cbMarkers[i].SelectedIndex = cbMarkers[i].Items.IndexOf(scores[i].Markers);
+                cbCarsGood[i].SelectedIndex = cbCarsGood[i].Items.IndexOf(scores[i].CarsGood);
+                cbCarsBad[i].SelectedIndex = cbCarsBad[i].Items.IndexOf(scores[i].CarsBad);
+                cbLogsGood[i].SelectedIndex = cbLogsGood[i].Items.IndexOf(scores[i].LogsGood);
+                cbLogsBad[i].SelectedIndex = cbLogsBad[i].Items.IndexOf(scores[i].LogsBad);
+                cbCoalGood[i].SelectedIndex = cbCoalGood[i].Items.IndexOf(scores[i].CoalGood);
+                cbCoalBad[i].SelectedIndex = cbCoalBad[i].Items.IndexOf(scores[i].CoalBad);
+                cbMultiplier[i].SelectedIndex = cbMultiplier[i].Items.IndexOf(scores[i].Multiplier);
                 
-                cbMarkers[i].SelectedIndex = cbMarkers[i].Items.IndexOf(test[i].Markers);
-                cbCarsGood[i].SelectedIndex = cbCarsGood[i].Items.IndexOf(test[i].CarsGood);
-                cbCarsBad[i].SelectedIndex = cbCarsBad[i].Items.IndexOf(test[i].CarsBad);
-                cbLogsGood[i].SelectedIndex = cbLogsGood[i].Items.IndexOf(test[i].LogsGood);
-                cbLogsBad[i].SelectedIndex = cbLogsBad[i].Items.IndexOf(test[i].LogsBad);
-                cbCoalGood[i].SelectedIndex = cbCoalGood[i].Items.IndexOf(test[i].CoalGood);
-                cbCoalBad[i].SelectedIndex = cbCoalBad[i].Items.IndexOf(test[i].CoalBad);
-                cbMultiplier[i].SelectedIndex = cbMultiplier[i].Items.IndexOf(test[i].Multiplier);
-                
-                lblScores[i].Text = test[i].GetScore().ToString();
+                lblScores[i].Text = scores[i].GetScore().ToString();
+            }
+        }
+
+        public bool ScoresModified { get { return modified; } }
+
+        public void CommitScores()
+        {
+            for (int i = 0; i < 4; ++i)
+            {
+                scores[i].Markers = (int)cbMarkers[i].SelectedItem;
+                scores[i].CarsGood = (int)cbCarsGood[i].SelectedItem;
+                scores[i].CarsBad = (int)cbCarsBad[i].SelectedItem;
+                scores[i].LogsGood = (int)cbLogsGood[i].SelectedItem;
+                scores[i].LogsBad = (int)cbLogsBad[i].SelectedItem;
+                scores[i].CoalGood = (int)cbCoalGood[i].SelectedItem;
+                scores[i].CoalBad = (int)cbCoalBad[i].SelectedItem;
+                scores[i].Multiplier = (double)cbMultiplier[i].SelectedItem;                               
             }
         }
 
@@ -56,10 +76,16 @@ namespace Scoring
             b.DropDownStyle = ComboBoxStyle.DropDownList;
             b.SelectedIndex = 0;
             b.Width = 10;
+            b.SelectedValueChanged += new EventHandler(b_SelectedValueChanged);
            
             this.tableLayoutPanel1.Controls.Add(b, column, row);
 
             return b;
+        }
+
+        void b_SelectedValueChanged(object sender, EventArgs e)
+        {
+            modified = true;
         }
 
         private Label BuildLabel(int column, int row)
@@ -69,6 +95,13 @@ namespace Scoring
             l.TextAlign = ContentAlignment.MiddleCenter;
             this.tableLayoutPanel1.Controls.Add(l, column, row);
             return l;
+        }
+
+        private object[] ToObject<T>(T[] type)
+        {
+            object[] o = new object[type.Length];
+            type.CopyTo(o, 0);
+            return o;
         }
 
         private void ScoringInput_Load(object sender, EventArgs e)
@@ -86,15 +119,14 @@ namespace Scoring
             lblTeams[2].BackColor = Color.LightBlue;
             lblTeams[3].BackColor = Color.Yellow;
 
-            //markers
-            values = new object[] { 0, 1, 2 };
+            //markers                        
             for (int i = 1; i <= 4; ++i)
             {
-                cbMarkers.Add(BuildCombo(values, 1, i + 1));
+                cbMarkers.Add(BuildCombo(ToObject(Score.MARKERS), 1, i + 1));
             }
 
             //good cars
-            values = new object[] { 0, 1, 2 };
+            values = ToObject(Score.CARS);
             for (int i = 1; i <= 4; ++i)
             {
                 cbCarsGood.Add(BuildCombo(values, 2, i + 1));                
@@ -107,7 +139,7 @@ namespace Scoring
             }
 
             //good logs
-            values = new object[] { 0, 1, 2, 3 };
+            values = ToObject(Score.LOGS);
             for (int i = 1; i <= 4; ++i)
             {
                 cbLogsGood.Add(BuildCombo(values, 4, i + 1));
@@ -119,7 +151,7 @@ namespace Scoring
             }
 
             //good coal
-            values = new object[] { 0, 1, 2, 3, 4, 5 };
+            values = ToObject(Score.COAL);
             for (int i = 1; i <= 4; ++i)
             {
                 cbCoalGood.Add(BuildCombo(values, 6, i + 1));
@@ -130,11 +162,14 @@ namespace Scoring
                 cbCoalBad.Add(BuildCombo(values, 7, i + 1));
             }
 
-            //multiplier
-            values = new object[] { 1.0f, 1.1f, 1.2f, 1.5f };
+            //multiplier            
             for (int i = 1; i <= 4; ++i)
             {
-                cbMultiplier.Add(BuildCombo(values,8, i + 1));
+                ComboBox b = BuildCombo(ToObject(Score.MUTILIERS), 8, i + 1);
+                b.FormatString = "0.0";
+                b.FormattingEnabled = true;                
+                cbMultiplier.Add(b);
+                
             }
 
             //score
