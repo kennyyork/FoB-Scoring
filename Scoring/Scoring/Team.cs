@@ -42,6 +42,11 @@ namespace Scoring
             rounds.Add(round);
         }
 
+        public Score GetScore(Round round)
+        {
+            return scores.SingleOrDefault(s => s.Round == round);
+        }
+
         public override string ToString()
         {
             return string.Format("{0},{1}", Number, Name);

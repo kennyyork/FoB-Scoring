@@ -99,7 +99,6 @@
     <Compile Include="WebDisplay.Designer.cs">
       <DependentUpon>WebDisplay.cs</DependentUpon>
     </Compile>
-    <Compile Include="WebGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="game.txt">

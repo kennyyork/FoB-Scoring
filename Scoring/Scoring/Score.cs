@@ -34,8 +34,13 @@ namespace Scoring
 
         public double GetScore() 
         {
-            double result = Markers * MARKER_POINTS + Math.Max(0,(CarsGood * CAR_POINTS + LogsGood * LOG_POINTS + CoalGood * COAL_POINTS) * Multiplier - (CarsBad * CAR_POINTS + LogsBad * LOG_POINTS + CoalBad * COAL_POINTS));
-            return result;
+            //double result = Markers * MARKER_POINTS + Math.Max(0,(CarsGood * CAR_POINTS + LogsGood * LOG_POINTS + CoalGood * COAL_POINTS) * Multiplier - (CarsBad * CAR_POINTS + LogsBad * LOG_POINTS + CoalBad * COAL_POINTS));
+            return CalcScore(Markers, CarsGood, CarsBad, LogsGood, LogsBad, CoalGood, CoalBad, Multiplier);
+        }
+
+        public static double CalcScore(int markers, int carsGood, int carsBad, int logsGood, int logsBad, int coalGood, int coalBad, double multiplier)
+        {
+            return markers * MARKER_POINTS + Math.Max(0, (carsGood * CAR_POINTS + logsGood * LOG_POINTS + coalGood * COAL_POINTS) * multiplier - (carsBad * CAR_POINTS + logsBad * LOG_POINTS + coalBad * COAL_POINTS));
         }
 
         public Score(Team team, Round round)

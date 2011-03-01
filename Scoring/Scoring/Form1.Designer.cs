@@ -35,9 +35,9 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.btnNotebook = new System.Windows.Forms.Button();
             this.nudRound = new System.Windows.Forms.NumericUpDown();
-            this.scoringInput1 = new Scoring.ScoringInput();
             this.pnlScoreIn = new System.Windows.Forms.Panel();
-            this.button1 = new System.Windows.Forms.Button();
+            this.btnSubmit = new System.Windows.Forms.Button();
+            this.scoringInput1 = new Scoring.ScoringInput();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudRound)).BeginInit();
             this.pnlScoreIn.SuspendLayout();
@@ -109,6 +109,26 @@
             this.nudRound.Size = new System.Drawing.Size(62, 20);
             this.nudRound.TabIndex = 13;
             this.nudRound.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.nudRound.ValueChanged += new System.EventHandler(this.nudRound_ValueChanged);
+            // 
+            // pnlScoreIn
+            // 
+            this.pnlScoreIn.Controls.Add(this.btnSubmit);
+            this.pnlScoreIn.Controls.Add(this.nudRound);
+            this.pnlScoreIn.Location = new System.Drawing.Point(271, 205);
+            this.pnlScoreIn.Name = "pnlScoreIn";
+            this.pnlScoreIn.Size = new System.Drawing.Size(132, 26);
+            this.pnlScoreIn.TabIndex = 14;
+            // 
+            // btnSubmit
+            // 
+            this.btnSubmit.Location = new System.Drawing.Point(71, 3);
+            this.btnSubmit.Name = "btnSubmit";
+            this.btnSubmit.Size = new System.Drawing.Size(58, 20);
+            this.btnSubmit.TabIndex = 14;
+            this.btnSubmit.Text = "Enter";
+            this.btnSubmit.UseVisualStyleBackColor = true;
+            this.btnSubmit.Click += new System.EventHandler(this.btnSubmit_Click);
             // 
             // scoringInput1
             // 
@@ -116,24 +136,6 @@
             this.scoringInput1.Name = "scoringInput1";
             this.scoringInput1.Size = new System.Drawing.Size(650, 180);
             this.scoringInput1.TabIndex = 5;
-            // 
-            // pnlScoreIn
-            // 
-            this.pnlScoreIn.Controls.Add(this.button1);
-            this.pnlScoreIn.Controls.Add(this.nudRound);
-            this.pnlScoreIn.Location = new System.Drawing.Point(162, 309);
-            this.pnlScoreIn.Name = "pnlScoreIn";
-            this.pnlScoreIn.Size = new System.Drawing.Size(132, 26);
-            this.pnlScoreIn.TabIndex = 14;
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(71, 3);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(58, 20);
-            this.button1.TabIndex = 14;
-            this.button1.Text = "Enter";
-            this.button1.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
@@ -167,7 +169,7 @@
         private System.Windows.Forms.Button btnNotebook;
         private System.Windows.Forms.NumericUpDown nudRound;
         private System.Windows.Forms.Panel pnlScoreIn;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnSubmit;
     }
 }
 

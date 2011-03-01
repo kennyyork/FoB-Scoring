@@ -31,9 +31,7 @@ namespace Scoring
         private int prelimCount = 0;
         private const int WILDCARD_COUNT = 1;
         private const int SEMIFINAL_COUNT = 8;
-        private const int FINAL_COUNT = 8;
-
-        private Round.Types gameState = Round.Types.Semifinals;
+        private const int FINAL_COUNT = 8;        
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -54,17 +52,6 @@ namespace Scoring
                 activeRound = scores.Max(s => s.Round.Number);
             }
 
-            if (activeRound == 0)
-            {
-                pnlScoreIn.Enabled = false;
-            }
-            else
-            {
-                pnlScoreIn.Enabled = true;
-                nudRound.Minimum = 0;
-                nudRound.Maximum = activeRound;
-            }
-           
             UpdateUI();            
         }
 
@@ -74,6 +61,26 @@ namespace Scoring
             btnWildcard.Enabled = (activeRound >= prelimCount) && wildcardEntered;
             btnSemi.Enabled = (activeRound >= (prelimCount + WILDCARD_COUNT));
             btnFinals.Enabled = (activeRound >= (prelimCount + WILDCARD_COUNT + SEMIFINAL_COUNT));
+
+            if (activeRound == 0)
+            {
+                pnlScoreIn.Enabled = false;
+            }
+            else
+            {
+                pnlScoreIn.Enabled = true;
+                nudRound.Minimum = 1;
+                nudRound.Maximum = activeRound;
+            }
+
+            if (nudRound.Value == activeRound)
+            {
+                btnSubmit.Text = "Submit";
+            }
+            else if( nudRound.Value > 0 )
+            {
+                btnSubmit.Text = "Edit";
+            }
         }
 
         private List<Team> teams = new List<Team>();
@@ -273,15 +280,40 @@ namespace Scoring
                 }
 
                 rounds = GenerateSeeding(teams, roundsPerTeam, false);
-                
-                wd.RoundDisplay(rounds,true);
-                wd.WriteHTML("test.html");
-                wd.QuickPrint();
+                activeRound = 1;
+                UpdateUI();
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
             }
+        }
+
+        private void nudRound_ValueChanged(object sender, EventArgs e)
+        {
+            //load the scores
+            if (scoringInput1.ScoresModified)
+            {
+                if (MessageBox.Show("Scores have been modified, discard?", "Discard Scores?", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.Cancel)
+                {
+                    return;
+                }
+            }
+
+            scoringInput1.SetScores(rounds[(int)nudRound.Value]);
+            UpdateUI();
+        }
+
+        private void btnSubmit_Click(object sender, EventArgs e)
+        {
+            scoringInput1.CommitScores();
+            if (btnSubmit.Text == "Submit")
+            {
+                ++activeRound;
+            }
+
+            UpdateUI();
+            nudRound.Value = activeRound;
         }
     }
 

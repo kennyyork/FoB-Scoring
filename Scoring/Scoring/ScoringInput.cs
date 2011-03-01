@@ -13,7 +13,7 @@ namespace Scoring
     {
         public ScoringInput()
         {
-            InitializeComponent();
+            InitializeComponent();            
         }
 
         private List<Label> lblTeams = new List<Label>();
@@ -27,12 +27,19 @@ namespace Scoring
         private List<ComboBox> cbCoalBad = new List<ComboBox>();
         private List<ComboBox> cbMultiplier = new List<ComboBox>();
 
-        private bool modified = false;
-        Score[] scores;
+        private bool modified = false;        
+        Score[] scores = new Score[4];
+        Round currentRound;
 
-        public void SetScores(Score team1, Score team2, Score team3, Score team4)
+        public void SetScores(Round round)
         {
-            scores = new Score[] { team1, team2, team3, team4 };
+            currentRound = round;
+
+            //see if scores exist for this round, if not create them
+            scores[0] = round.Red.GetScore(round) ?? new Score(round.Red,round);
+            scores[1] = round.Green.GetScore(round) ?? new Score(round.Green, round);
+            scores[2] = round.Blue.GetScore(round) ?? new Score(round.Blue, round);
+            scores[3] = round.Yellow.GetScore(round) ?? new Score(round.Yellow, round);            
 
             for (int i = 0; i < 4; ++i)
             {
@@ -49,12 +56,16 @@ namespace Scoring
                 
                 lblScores[i].Text = scores[i].GetScore().ToString();
             }
+
+            modified = false;
         }
 
         public bool ScoresModified { get { return modified; } }
 
         public void CommitScores()
         {
+            if (!modified) return;
+
             for (int i = 0; i < 4; ++i)
             {
                 scores[i].Markers = (int)cbMarkers[i].SelectedItem;
@@ -66,6 +77,8 @@ namespace Scoring
                 scores[i].CoalBad = (int)cbCoalBad[i].SelectedItem;
                 scores[i].Multiplier = (double)cbMultiplier[i].SelectedItem;                               
             }
+
+            modified = false;
         }
 
         private ComboBox BuildCombo(object[] values, int column, int row)
@@ -86,6 +99,23 @@ namespace Scoring
         void b_SelectedValueChanged(object sender, EventArgs e)
         {
             modified = true;
+
+            if (currentRound != null)
+            {
+                for (int i = 0; i < 4; ++i)
+                {
+                    int Markers = (int)cbMarkers[i].SelectedItem;
+                    int CarsGood = (int)cbCarsGood[i].SelectedItem;
+                    int CarsBad = (int)cbCarsBad[i].SelectedItem;
+                    int LogsGood = (int)cbLogsGood[i].SelectedItem;
+                    int LogsBad = (int)cbLogsBad[i].SelectedItem;
+                    int CoalGood = (int)cbCoalGood[i].SelectedItem;
+                    int CoalBad = (int)cbCoalBad[i].SelectedItem;
+                    double Multiplier = (double)cbMultiplier[i].SelectedItem;
+
+                    lblScores[i].Text = Score.CalcScore(Markers, CarsGood, CarsBad, LogsGood, LogsBad, CoalGood, CoalBad, Multiplier).ToString("0.00");
+                }
+            }
         }
 
         private Label BuildLabel(int column, int row)
@@ -118,6 +148,12 @@ namespace Scoring
             lblTeams[1].BackColor = Color.Green;
             lblTeams[2].BackColor = Color.LightBlue;
             lblTeams[3].BackColor = Color.Yellow;
+
+            //score
+            for (int i = 1; i <= 4; ++i)
+            {
+                lblScores.Add(BuildLabel(9, i + 1));
+            }
 
             //markers                        
             for (int i = 1; i <= 4; ++i)
@@ -172,11 +208,7 @@ namespace Scoring
                 
             }
 
-            //score
-            for (int i = 1; i <= 4; ++i)
-            {
-                lblScores.Add(BuildLabel(9, i + 1));
-            }
+            modified = false;
         }
     }
 }

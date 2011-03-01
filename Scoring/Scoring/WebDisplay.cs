@@ -71,9 +71,17 @@ namespace Scoring
             lastOutput = text;
         }
 
+        private void WaitForComplete()
+        {
+            while (webBrowser.ReadyState != WebBrowserReadyState.Complete)
+            {
+                Application.DoEvents();
+            }
+        }
+
         public void WriteHTML(string path)
         {
-            DateTime t = DateTime.Now;
+            WaitForComplete();
             
             try
             {
@@ -85,30 +93,9 @@ namespace Scoring
             }
         }
 
-        public void QuickPrint()
-        {
-            while (webBrowser.ReadyState != WebBrowserReadyState.Complete)
-            {
-                Application.DoEvents();
-            }
-
-            //Show();
-            //Visible = false;
-            Print();
-            //Hide();
-            //Close();
-        }
-
         public void Print()
         {
-            DateTime t = DateTime.Now;
-
-            //reset.WaitOne();
-
-            if (webBrowser.ReadyState != WebBrowserReadyState.Complete)
-            {
-                return;
-            }
+            WaitForComplete();
 
             string keyName = @"Software\Microsoft\Internet Explorer\PageSetup";
             using (RegistryKey key = Registry.CurrentUser.OpenSubKey(keyName, true))
@@ -119,8 +106,8 @@ namespace Scoring
                     string old_header = (string)key.GetValue("header");
                     key.SetValue("footer", "");
                     key.SetValue("header", "");
-                    //webBrowser.ShowPrintPreviewDialog();
-                    webBrowser.Print();      
+                    webBrowser.ShowPrintPreviewDialog();
+                    //webBrowser.Print();      
                     key.SetValue("footer", old_footer);
                     key.SetValue("header", old_header);
                 }
