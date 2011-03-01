@@ -32,12 +32,22 @@ namespace Scoring
 
         public void AddScore(Score score)
         {
+            if (scores.Contains(score))
+            {
+                throw new InvalidOperationException("Score already exists in collection");
+            }
+
             scores.Add(score);
             LastRound = score.Round.Number;
         }
 
         public void AddRound(Round round)
-        {
+        {            
+            if (rounds.Contains(round))
+            {
+                throw new InvalidOperationException("Round already exists in collection");
+            }
+
             LastRound = round.Number;
             rounds.Add(round);
         }

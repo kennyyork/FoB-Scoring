@@ -16,7 +16,7 @@ namespace Scoring
         }
 
         public int Number { get; private set; }
-        public Types Type { get; private set; }
+        public Types Type { get;  set; }
 
         private const int RED = 0;
         private const int GREEN = 1;
@@ -86,7 +86,7 @@ namespace Scoring
 
         public override string ToString()
         {
-            return string.Format("{0},{1},{2},{3},{4},{5}",Number,(int)Type,Red.Number,Green.Name,Blue.Name,Yellow.Number);
+            return string.Format("{0},{1},{2},{3},{4},{5}",Number,(int)Type,Red.Number,Green.Number,Blue.Number,Yellow.Number);
         }
 
         public static Round FromString(List<Team> teams, string line)

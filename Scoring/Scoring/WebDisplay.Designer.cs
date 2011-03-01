@@ -75,6 +75,7 @@
             this.Controls.Add(this.webBrowser);
             this.Name = "WebDisplay";
             this.Text = "WebDisplay";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.WebDisplay_FormClosing);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);

@@ -37,7 +37,9 @@
             this.nudRound = new System.Windows.Forms.NumericUpDown();
             this.pnlScoreIn = new System.Windows.Forms.Panel();
             this.btnSubmit = new System.Windows.Forms.Button();
+            this.btnCurrentSched = new System.Windows.Forms.Button();
             this.scoringInput1 = new Scoring.ScoringInput();
+            this.btnTeamScore = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudRound)).BeginInit();
             this.pnlScoreIn.SuspendLayout();
@@ -130,6 +132,16 @@
             this.btnSubmit.UseVisualStyleBackColor = true;
             this.btnSubmit.Click += new System.EventHandler(this.btnSubmit_Click);
             // 
+            // btnCurrentSched
+            // 
+            this.btnCurrentSched.Location = new System.Drawing.Point(674, 237);
+            this.btnCurrentSched.Name = "btnCurrentSched";
+            this.btnCurrentSched.Size = new System.Drawing.Size(103, 34);
+            this.btnCurrentSched.TabIndex = 15;
+            this.btnCurrentSched.Text = "View Current Schedule";
+            this.btnCurrentSched.UseVisualStyleBackColor = true;
+            this.btnCurrentSched.Click += new System.EventHandler(this.btnCurrentSched_Click);
+            // 
             // scoringInput1
             // 
             this.scoringInput1.Location = new System.Drawing.Point(12, 12);
@@ -137,11 +149,23 @@
             this.scoringInput1.Size = new System.Drawing.Size(650, 180);
             this.scoringInput1.TabIndex = 5;
             // 
+            // btnTeamScore
+            // 
+            this.btnTeamScore.Location = new System.Drawing.Point(674, 277);
+            this.btnTeamScore.Name = "btnTeamScore";
+            this.btnTeamScore.Size = new System.Drawing.Size(103, 34);
+            this.btnTeamScore.TabIndex = 16;
+            this.btnTeamScore.Text = "View Team Score";
+            this.btnTeamScore.UseVisualStyleBackColor = true;
+            this.btnTeamScore.Click += new System.EventHandler(this.btnTeamScore_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(787, 553);
+            this.Controls.Add(this.btnTeamScore);
+            this.Controls.Add(this.btnCurrentSched);
             this.Controls.Add(this.pnlScoreIn);
             this.Controls.Add(this.btnNotebook);
             this.Controls.Add(this.groupBox1);
@@ -170,6 +194,8 @@
         private System.Windows.Forms.NumericUpDown nudRound;
         private System.Windows.Forms.Panel pnlScoreIn;
         private System.Windows.Forms.Button btnSubmit;
+        private System.Windows.Forms.Button btnCurrentSched;
+        private System.Windows.Forms.Button btnTeamScore;
     }
 }
 

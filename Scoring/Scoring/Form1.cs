@@ -13,6 +13,17 @@ namespace Scoring
 {
     public partial class Form1 : Form
     {
+        enum GameState
+        {
+            None,
+            Preliminary,
+            Wildcard,
+            SemiFinals,
+            Finals
+        }
+
+        private GameState gameState = GameState.None;
+
         public Form1()
         {
             InitializeComponent();            
@@ -50,6 +61,11 @@ namespace Scoring
             if (scores.Count > 0)
             {
                 activeRound = scores.Max(s => s.Round.Number);
+                nudRound.Value = activeRound;
+            }
+            else if (gameState == GameState.Preliminary)
+            {
+                activeRound = 1;
             }
 
             UpdateUI();            
@@ -143,8 +159,21 @@ namespace Scoring
             }
             catch
             {                
-                rounds.Clear();
-                throw;
+                rounds.Clear();                
+            }
+            
+            //are the rounds valid?
+            if (rounds.Count > 0 && rounds.Count < prelimCount)
+            {
+                if (DialogResult.OK == MessageBox.Show("Invalid round data, clear existing file?", "Error", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation))
+                {
+                    rounds.Clear();
+                    WriteRounds();
+                }
+                else
+                {
+                    throw new InvalidOperationException("Invalid rounds data");
+                }
             }
 
             try
@@ -158,40 +187,78 @@ namespace Scoring
             }
             catch
             {
-                scores.Clear();
-                throw;
+                scores.Clear();                
+            }
+
+            //figure out what state we are in
+            int prelimScores = prelimCount * 4;
+            if (scores.Count < prelimScores)
+            {
+                if (rounds.Count > 0)
+                {
+                    gameState = GameState.Preliminary;
+                }
+            }
+            else if (scores.Count < (prelimScores + WILDCARD_COUNT))
+            {
+                gameState = GameState.Wildcard;
+            }
+            else if (scores.Count < (prelimScores + WILDCARD_COUNT + SEMIFINAL_COUNT))
+            {
+                gameState = GameState.SemiFinals;
+            }
+            else if (scores.Count < (prelimScores + WILDCARD_COUNT + SEMIFINAL_COUNT + FINAL_COUNT))
+            {
+                gameState = GameState.Finals;
+            }
+            else
+            {
+                throw new InvalidOperationException("Could not determine game state");
             }
         }
-        //if (File.Exists(TEAM_FILE_PATH))
-        //    {
-        //        DialogResult dr = MessageBox.Show("File exists, overwrite?", "Caution", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
-        //        if (dr == DialogResult.Cancel) return;
-        //    }
+        
         private void WriteTeams()
         {
-            StreamWriter sw = new StreamWriter(File.OpenWrite(TEAM_FILE_PATH));
-            foreach (var t in teams)
-            {
-                sw.WriteLine(t);
-            }
+            Write(TEAM_FILE_PATH, teams);
         }
 
         private void WriteRounds()
         {
-            StreamWriter sw = new StreamWriter(File.OpenWrite(ROUNDS_FILE_PATH));
-            foreach (var t in rounds)
-            {
-                sw.WriteLine(t);
-            }
+            Write(ROUNDS_FILE_PATH, rounds);            
+        }
+
+        private void AppendRound(Round r)
+        {
+            Append(ROUNDS_FILE_PATH, r);
         }
 
         private void WriteScores()
         {
-            StreamWriter sw = new StreamWriter(File.OpenWrite(SCORES_FILE_PATH));
-            foreach (var t in scores)
+            Write(SCORES_FILE_PATH, scores);
+        }
+
+        private void AppendScore(Score s)
+        {
+            Append(SCORES_FILE_PATH, s);
+        }
+
+        private void Append<T>(string file, T item)
+        {
+            StreamWriter sw = File.AppendText(file);
+            sw.WriteLine(item);
+            sw.Flush();
+            sw.Close();
+        }
+
+        private void Write<T>(string file, IEnumerable<T> source)
+        {
+            StreamWriter sw = new StreamWriter(File.OpenWrite(file));
+            foreach (var t in source)
             {
                 sw.WriteLine(t);
             }
+            sw.Flush();
+            sw.Close();
         }
 
         private void CenterNud()
@@ -281,6 +348,10 @@ namespace Scoring
 
                 rounds = GenerateSeeding(teams, roundsPerTeam, false);
                 activeRound = 1;
+                gameState = GameState.Preliminary;
+
+                WriteRounds();
+
                 UpdateUI();
             }
             catch (Exception ex)
@@ -300,20 +371,66 @@ namespace Scoring
                 }
             }
 
-            scoringInput1.SetScores(rounds[(int)nudRound.Value]);
+            scoringInput1.SetScores(rounds[(int)nudRound.Value - 1]);
             UpdateUI();
         }
 
         private void btnSubmit_Click(object sender, EventArgs e)
         {
             scoringInput1.CommitScores();
+            foreach (var s in scoringInput1.CurrentScores)
+            {                
+                if (btnSubmit.Text == "Submit")
+                {
+                    scores.Add(s);
+                    AppendScore(s);
+                }
+            }
+
             if (btnSubmit.Text == "Submit")
             {
                 ++activeRound;
             }
+            else //edit forces rewrite
+            {
+                WriteScores();
+            }
 
             UpdateUI();
             nudRound.Value = activeRound;
+        }
+
+        private void btnCurrentSched_Click(object sender, EventArgs e)
+        {
+            IEnumerable<Round> result = null;
+            string title = string.Empty;
+
+            switch (gameState)
+            {
+                case GameState.Preliminary:
+                    result = from r in rounds where r.Type == Round.Types.Preliminary select r;
+                    title = "Prelimiary Rounds";
+                    break;
+            }
+
+            if (result != null && result.Count() > 0)
+            {
+                wd.RoundDisplay(title, result.ToList(), false);
+                wd.Show();
+            }
+        }
+
+        private void btnTeamScore_Click(object sender, EventArgs e)
+        {
+            //wd.TeamRoundDisplay(teams[0]);
+            //wd.ShowDialog();
+            wd.TeamScoreDisplay(teams[0]);
+            wd.ShowDialog();
+
+            teams[0].Scores[0].Round.Type = Round.Types.Wildcard;
+
+            wd.TeamScoreDisplay(teams[0]);
+            wd.ShowDialog();
         }
     }
 

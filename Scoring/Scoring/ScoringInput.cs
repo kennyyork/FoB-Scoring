@@ -31,6 +31,14 @@ namespace Scoring
         Score[] scores = new Score[4];
         Round currentRound;
 
+        public List<Score> CurrentScores
+        {
+            get
+            {
+                return scores.ToList();
+            }
+        }
+
         public void SetScores(Round round)
         {
             currentRound = round;
@@ -206,7 +214,7 @@ namespace Scoring
                 b.FormattingEnabled = true;                
                 cbMultiplier.Add(b);
                 
-            }
+            }          
 
             modified = false;
         }

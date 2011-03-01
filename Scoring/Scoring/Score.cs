@@ -48,6 +48,7 @@ namespace Scoring
             this.Team = team;
             Multiplier = 1.0f;
             Round = round;
+            team.AddScore(this);
         }
 
         public Score(Score score)
