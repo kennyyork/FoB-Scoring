@@ -6,10 +6,12 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using System.Web.UI.HtmlControls;
 using Microsoft.Win32;
 using System.IO;
 using System.Threading;
+using NVelocity;
+using NVelocity.App;
+using NVelocity.Context;
 
 namespace Scoring
 {
@@ -19,10 +21,21 @@ namespace Scoring
         {                        
             InitializeComponent();
             ReloadCSS(cssPath);
+            VelocityEngine velocity = new VelocityEngine();
+            velocity.Init();
+
+            Template t = velocity.GetTemplate("test.vm");
+            VelocityContext c = new VelocityContext();
+            c.Put("k", 1);
+            StringWriter sw = new StringWriter();
+            t.Merge(c, sw);
+            sw.GetStringBuilder().ToString();
         }
 
+        string cssPath;
         public void ReloadCSS(string cssPath)
         {
+            this.cssPath = cssPath;
             //file:///D:/CSS/Style.css
             string path = Path.GetDirectoryName(Application.ExecutablePath);
             
@@ -138,9 +151,30 @@ namespace Scoring
             webBrowser.DocumentText = document;
         }
 
+        private const string CURRENT_ROUND_HEADER = @"<thead><td>Team</td><td>Markers</td><td>Good Cars</td><td>Bad Cars</td><td>Good Logs</td><td>Bad Logs</td><td>Good Coal</td><td>Bad Coal</td><td>Mulitplier</td><td>Score</td><td>Total</td></thead>";        
+        private const string CURRENT_ROUND_ROW = @"<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td><td>{5}</td><td>{6}</td><td>{7}</td><td>{8}</td><td>{9}</td><td>{10}</td></tr>";
+        
+        public void UpdateCurrentRound(Round current, Round next1, Round next2)
+        {
+            HtmlBuilder html = new HtmlBuilder();
+            html.LinkCSS(cssPath);
+            using (var body = html.WriteTag("body",null))
+            {
+                using (var table = html.WriteTag("table", null))
+                {
+                    //using var 
+                }
+            }
+            //StringBuilder sb = new StringBuilder();
+            //sb.AppendFormat(TABLE_TITLE, "Round #" + current.Number.ToString());
+            //sb.Append(TABLE_BODY_START);
 
-
-
+            //for (int i = 0; i < 4; ++i)
+            //{
+            //    Score s = current.GetScore(i);
+            //    sb.AppendFormat(CURRENT_ROUND_ROW, current.Teams[i].Name, s.Markers, s.CarsGood, s.CarsBad, s.LogsGood, s.LogsBad, s.CoalGood, s.CoalBad, s.Multiplier, s.GetScore(), sum);
+            //}
+        }
 
         private void WaitForComplete()
         {
@@ -207,7 +241,7 @@ namespace Scoring
 
         private void toolStripButton2_Click(object sender, EventArgs e)
         {
-            webBrowser.Refresh(WebBrowserRefreshOption.Completely);
+            webBrowser.Refresh(WebBrowserRefreshOption.Completely);         
         }
 
         private void toolStripButton3_Click(object sender, EventArgs e)
@@ -215,4 +249,102 @@ namespace Scoring
             Print(true);   
         }
     }
+
+    public class HtmlBuilder : IDisposable
+    {
+        private StringBuilder html;
+
+        public HtmlBuilder()
+        {
+            html = new StringBuilder();
+            html.AppendFormat("<html>");
+        }
+        
+        public void LinkCSS(string path)
+        {
+            string head = @"<head><link rel=""stylesheet"" type=""text/css"" href=""{0}"" media=""print,screen""/></head>";
+            html.AppendFormat(head, path);
+        }
+
+        //public HtmlElement CreateBody(Dictionary<string, string> options)
+        //{
+        //    return WriteTag("body", options);
+        //}
+
+        //public HtmlElement CreateTable(Dictionary<string,string> options)
+        //{
+        //    return WriteTag("table",options);            
+        //}
+
+        //public HtmlElement CreateTable(Dictionary<string, string> options)
+        //{
+        //    return WriteTag("table", options);
+        //}
+
+        public HtmlElement WriteTag(string tag, Dictionary<string, string> options)
+        {
+            html.AppendFormat("<{0}",tag);
+            if (options != null)
+            {
+                foreach (var pair in options)
+                {
+                    html.AppendFormat("{0}=\"{1}\"", pair.Key, pair.Value);
+                }
+            }
+            html.Append(">");
+            return new HtmlElement(this, tag);
+        }
+
+        #region Write Functions
+        public void Append(string text)
+        {            
+            html.Append(text);
+        }
+
+        public void AppendLine()
+        {
+            html.AppendLine();
+        }
+
+        public void AppendFormat(string text, params object[] args)
+        {
+            html.AppendFormat(text, args);
+        }
+
+        public void Clear()
+        {
+            html.Length = 0;
+        }
+        #endregion
+
+        #region IDisposable Members
+
+        public void Dispose()
+        {
+            html.AppendFormat("</html>");
+        }
+
+        #endregion
+
+        public class HtmlElement : IDisposable
+        {
+            private string tag;
+            private HtmlBuilder builder;
+
+            public HtmlElement(HtmlBuilder parent, string tag)
+            {
+                builder = parent;
+                this.tag = tag;   
+            }
+
+            #region IDisposable Members
+
+            public void Dispose()
+            {
+                builder.AppendFormat("</{0}>",tag);
+            }
+
+            #endregion
+        }
+    }    
 }

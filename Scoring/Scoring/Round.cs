@@ -18,10 +18,15 @@ namespace Scoring
         public int Number { get; private set; }
         public Types Type { get;  set; }
 
-        private const int RED = 0;
-        private const int GREEN = 1;
-        private const int BLUE = 2;
-        private const int YELLOW = 3;
+        public const int RED = 0;
+        public const int GREEN = 1;
+        public const int BLUE = 2;
+        public const int YELLOW = 3;
+
+        public IList<Team> Teams
+        {
+            get { return teams; }
+        }
         
         public Team Red 
         {
@@ -82,6 +87,11 @@ namespace Scoring
                 default:
                     return "Unknown Error";
             }
+        }
+
+        public Score GetScore(int color)
+        {
+            return teams[color].GetScore(this);
         }
 
         public override string ToString()
