@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
+using System.Security.Cryptography;
 
 namespace Scoring
 {
@@ -16,6 +17,8 @@ namespace Scoring
         {
             InitializeComponent();            
         }
+
+        WebDisplay wd = new WebDisplay();
 
         private const string GAME_FILE_PATH = "game.txt";
         private const string TEAM_FILE_PATH = "teams.txt";
@@ -146,7 +149,7 @@ namespace Scoring
                 }
                 sr.Close();
             }
-            catch (Exception ex)
+            catch
             {
                 scores.Clear();
                 throw;
@@ -200,26 +203,44 @@ namespace Scoring
               //if 4 not available, re-add all teams and select where 1) not in current set and 2) not in last round
                 //if 4 not available, select any needed
 
+            StringBuilder debug = new StringBuilder();
+
             List<Round> rounds = new List<Round>();
             int required = (teams.Count * gamesPerTeam) / 4;
 
+            List<Team> availTeams = teams.Shuffle();
             while (rounds.Count < required)
-            {                   
-                List<Team> availTeams = teams.Shuffle();
-                List<Team> set = availTeams.TakeAndRemove(4, t => t.LastRound != rounds.Count - 1);
+            {                                   
+                List<Team> set = availTeams.TakeAndRemove(4, t => t.LastRound != rounds.Count);
+                debug.AppendFormat("first set {0}  ",set.Count);
+                foreach (var s in set) { debug.AppendFormat(" {0} ", s); }
+                debug.AppendLine();
+
                 if (set.Count < 4)
                 {
+                    debug.AppendFormat("failed to pull 4, only got {0}\n", set.Count);
                     availTeams = teams.Shuffle();
-                    set.AddRange(availTeams.TakeAndRemove(4 - set.Count, t => (t.LastRound != rounds.Count - 1) && !set.Contains(t)));
+                    set.AddRange(availTeams.TakeAndRemove(4 - set.Count, t => (t.LastRound != rounds.Count) && !set.Contains(t)));
+
+                    debug.AppendFormat("second set {0}  ",set.Count);
+                    foreach (var s in set) { debug.AppendFormat(" {0} ", s); }
+                    debug.AppendLine();
 
                     if (set.Count < 4)
                     {
+                        debug.AppendFormat("failed to pull 4, only got {0}\n", set.Count);
+
                         if (!backToBack)
                         {
                             throw new InvalidOperationException("unable to generate a seeding with the provided inputs");
                         }
 
                         set.AddRange(availTeams.TakeAndRemove(4 - set.Count, t => !set.Contains(t)));
+
+                        debug.AppendFormat("final set {0}  ", set.Count);
+                        foreach (var s in set) { debug.AppendFormat(" {0} ", s); }
+                        debug.AppendLine();
+
                         if (set.Count < 4)
                         {
                             throw new InvalidOperationException("unable to generate a seeding with the provided inputs");
@@ -231,7 +252,6 @@ namespace Scoring
                 rounds.Add(r);
             }
 
-
             return rounds;
         }
 
@@ -239,7 +259,24 @@ namespace Scoring
         {
             try
             {
+                if (rounds.Count > 0)
+                {
+                    if (MessageBox.Show("Warning:  All current round data will be lost", "Warning", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.Cancel)
+                    {
+                        return;
+                    }
+
+                    if (MessageBox.Show("Seriously:  All current round data will be lost, are you sure?", "Warning", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.Cancel)
+                    {
+                        return;
+                    }
+                }
+
                 rounds = GenerateSeeding(teams, roundsPerTeam, false);
+                
+                wd.RoundDisplay(rounds,true);
+                wd.WriteHTML("test.html");
+                wd.QuickPrint();
             }
             catch (Exception ex)
             {
@@ -252,18 +289,41 @@ namespace Scoring
     {
         public static List<T> Shuffle<T>(this List<T> list)
         {
+            StringBuilder debug = new StringBuilder();
+
             List<T> temp = list.ToList();
 
-            Random rng = new Random();
-            int n = temp.Count;
+            RNGCryptoServiceProvider provider = new RNGCryptoServiceProvider();
+            int n = list.Count;
+            byte[] box = new byte[1];
+            int k;
+            T value;
+
             while (n > 1)
-            {
-                int k = rng.Next(n);
-                --n;
-                T value = temp[k];
+            {                
+                do 
+                    provider.GetBytes(box);
+                while (!(box[0] < n * (Byte.MaxValue / n)));
+                
+                k = (box[0] % n);
+                n--;
+                value = temp[k];
                 temp[k] = temp[n];
                 temp[n] = value;
             }
+
+            //Random rng = new Random();
+            //int n = temp.Count;
+            //while (n > 1)
+            //{
+            //    int k = rng.Next(n);
+            //    debug.AppendFormat("rng {0}\n", k);
+
+            //    --n;
+            //    T value = temp[k];
+            //    temp[k] = temp[n];
+            //    temp[n] = value;
+            //}
 
             return temp;
         }
@@ -271,7 +331,7 @@ namespace Scoring
         public static List<T> TakeAndRemove<T>(this List<T> source, int count, Func<T, bool> predicate)
         {
             List<T> result = new List<T>();
-            for (int i = 0; i < source.Count && result.Count < count; ++i)
+            for (int i = 0; i < source.Count && result.Count < count;)
             {
                 if (predicate(source[i]))
                 {
@@ -279,6 +339,8 @@ namespace Scoring
                     source.RemoveAt(i);
                     continue;
                 }
+
+                ++i;
             }
 
             return result;

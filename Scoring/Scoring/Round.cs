@@ -17,24 +17,71 @@ namespace Scoring
 
         public int Number { get; private set; }
         public Types Type { get; private set; }
-        public Team Red { get; private set; }
-        public Team Green { get; private set; }
-        public Team Blue { get; private set; }
-        public Team Yellow { get; private set; }
+
+        private const int RED = 0;
+        private const int GREEN = 1;
+        private const int BLUE = 2;
+        private const int YELLOW = 3;
+        
+        public Team Red 
+        {
+            get { return teams[RED]; }
+            private set { teams[RED] = value; }
+        }
+
+        public Team Green
+        {
+            get { return teams[GREEN]; }
+            private set { teams[GREEN] = value; }
+        }
+
+        public Team Blue
+        {
+            get { return teams[BLUE]; }
+            private set { teams[BLUE] = value; }
+        }
+
+        public Team Yellow
+        {
+            get { return teams[YELLOW]; }
+            private set { teams[YELLOW] = value; }
+        }
+
+        private List<Team> teams;
 
         public Round(int number, Types type, Team red, Team green, Team blue, Team yellow)
         {
+            teams = new List<Team>();
+
             Number = number;
             Type = type;
-            Red = red;
-            Green = green;
-            Blue = blue;
-            Yellow = yellow;
+            teams.Add(red);
+            teams.Add(green);
+            teams.Add(blue);
+            teams.Add(yellow);
 
             red.AddRound(this);
             green.AddRound(this);
             blue.AddRound(this);
-            yellow.AddRound(this);
+            yellow.AddRound(this);            
+        }
+
+        public string TeamColor(Team team)
+        {
+            int i = teams.IndexOf(team);
+            switch(i)
+            {
+                case RED:
+                    return "Red";
+                case GREEN:
+                    return "Green";
+                case BLUE:
+                    return "Blue";
+                case YELLOW:
+                    return "Yellow";
+                default:
+                    return "Unknown Error";
+            }
         }
 
         public override string ToString()

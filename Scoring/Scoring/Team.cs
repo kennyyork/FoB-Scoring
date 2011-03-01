@@ -10,8 +10,11 @@ namespace Scoring
     {
         public string Name { get; private set; }
         public int Number { get; private set; }
-        public int LastRound { get; set; }
+        public int LastRound { get; private set; }
         public double Notebook { get; set; }
+
+        public List<Round> Rounds { get { return rounds; } }
+        public List<Score> Scores { get { return scores; } }
 
         private List<Score> scores;
         private List<Round> rounds;
@@ -21,6 +24,7 @@ namespace Scoring
             Name = name;
             Number = number;
             Notebook = 0;
+            LastRound = -1;
 
             scores = new List<Score>();
             rounds = new List<Round>();
@@ -34,7 +38,8 @@ namespace Scoring
 
         public void AddRound(Round round)
         {
-
+            LastRound = round.Number;
+            rounds.Add(round);
         }
 
         public override string ToString()
