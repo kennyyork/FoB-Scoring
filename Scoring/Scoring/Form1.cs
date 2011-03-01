@@ -421,14 +421,7 @@ namespace Scoring
         }
 
         private void btnTeamScore_Click(object sender, EventArgs e)
-        {
-            //wd.TeamRoundDisplay(teams[0]);
-            //wd.ShowDialog();
-            wd.TeamScoreDisplay(teams[0]);
-            wd.ShowDialog();
-
-            teams[0].Scores[0].Round.Type = Round.Types.Wildcard;
-
+        {            
             wd.TeamScoreDisplay(teams[0]);
             wd.ShowDialog();
         }

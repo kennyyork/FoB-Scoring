@@ -1,4 +1,71 @@
-﻿body
+﻿table
 {
+	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+	font-size: 12px;
+	margin: 0px;
+	width: 100%;	
+	border-collapse: collapse;
+	border: 1px solid;
+	text-align: center	
 }
-th.table_title {	text-align:center;	background:blue;}
+
+thead
+{	
+	display: table-header-group;
+}
+
+th
+{
+	padding: 15px 10px 10px 10px;
+	font-weight: normal;
+	font-size: 14px;	
+	/*color: #039;*/
+	border-bottom: 2px solid;
+}
+
+/*#the_table tbody
+{
+	background: #e8edff;
+}*/
+
+tr
+{
+	page-break-inside: avoid;
+}
+
+td
+{
+	padding: 10px;
+	/*color: #669;*/
+	border-top: 1px solid;
+	border-right: 1px solid;
+}
+
+/*table
+{
+	width:100%
+}
+
+th.table_title
+{
+	text-align: center;
+	background: green;
+	font-size: 20pt;
+}tr{	margin: 0px;}td
+{
+	border-style: solid;
+	border-width: thin;
+	border-color: black;
+	text-align: center;
+	margin: 0px;
+}td.round_plain
+{
+	background-color: #99CCFF;
+	font-size: 16pt;
+}
+td.round_number
+{
+	background-color: #C0C0C0;
+}
+
+*/

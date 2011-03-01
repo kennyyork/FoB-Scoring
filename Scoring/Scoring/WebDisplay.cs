@@ -23,17 +23,25 @@ namespace Scoring
 
         public void ReloadCSS(string cssPath)
         {
-            string css = File.ReadAllText(cssPath);
-            css = css.Replace("{", "{{");
-            css = css.Replace("}", "}}");
-            HTML_BASE = string.Format(HTML_TEMPLATE, css);
+            //file:///D:/CSS/Style.css
+            string path = Path.GetDirectoryName(Application.ExecutablePath);
+            
+#if DEBUG
+            path = Path.Combine(path, "../../best.css");
+#else
+            path = Path.Combine(path, "best.css");
+#endif
+            path = @"file:///" + path;
+            
+            HTML_BASE = string.Format(HTML_TEMPLATE, path);
         }
 
+//        <style type=""text/css"">
+//{0}
+//</style>
         private const string HTML_TEMPLATE = @"<html>
 <head>
-<style type=""text/css"">
-{0}
-</style>
+<link rel=""stylesheet"" type=""text/css"" href=""{0}"" media=""print,screen""/>
 </head>
 <body>{{0}}
 </body>
@@ -43,10 +51,12 @@ namespace Scoring
         private const string TABLE = @"<table id=""the_table"" class=""{0}"">
 {1}
 </table>";
-        private const string TABLE_TITLE = @"<tr><th class=""table_title"" colspan=""100"">{0}</th></tr>
+        private const string TABLE_TITLE = @"<div><p class=""table_title"">{0}</p></div>
 ";
+        private const string TABLE_BODY_START = @"<tbody>";
+        private const string TABLE_BODY_END = @"</tbody>";
         
-        private const string ROUND_HEADER = @"<tr><th class=""round_number"">Round</th><th class=""round_red"">Red</th><th class=""round_green"">Green</th><th class=""round_blue"">Blue</th><th class=""round_yellow"">Yellow</th></tr>
+        private const string ROUND_HEADER = @"<thead><th class=""round_number"">Round</th><th class=""round_red"">Red</th><th class=""round_green"">Green</th><th class=""round_blue"">Blue</th><th class=""round_yellow"">Yellow</th></thead>
 ";
         private const string ROUND_ROW_COLOR = @"<tr><td class=""round_number"">{0}</td><td class=""round_red"">{1}</td><td class=""round_green"">{2}</td><td class=""round_blue"">{3}</td><td class=""round_yellow"">{4}</td></tr>
 ";
@@ -58,6 +68,7 @@ namespace Scoring
             StringBuilder sb = new StringBuilder();
             sb.AppendFormat(TABLE_TITLE, title);
             sb.Append(ROUND_HEADER);
+            sb.Append(TABLE_BODY_START);
 
             string template = withColor ? ROUND_ROW_COLOR : ROUND_ROW_NO_COLOR;
             foreach (var r in rounds)
@@ -65,6 +76,7 @@ namespace Scoring
                 //sb.AppendFormat(ROUND_ROW, r.Number, r.Red, r.Green, r.Blue, r.Yellow);
                 sb.AppendFormat(template, r.Number, r.Red.Name, r.Green.Name, r.Blue.Name, r.Yellow.Name);
             }
+            sb.Append(TABLE_BODY_END);
 
             string table = string.Format(TABLE, "round_table", sb.ToString());
             string document = string.Format(HTML_BASE, table);
@@ -128,6 +140,8 @@ namespace Scoring
 
 
 
+
+
         private void WaitForComplete()
         {
             while (webBrowser.ReadyState != WebBrowserReadyState.Complete)
@@ -150,7 +164,7 @@ namespace Scoring
             }
         }
 
-        public void Print()
+        public void Print(bool preview)
         {
             WaitForComplete();
 
@@ -163,8 +177,14 @@ namespace Scoring
                     string old_header = (string)key.GetValue("header");
                     key.SetValue("footer", "");
                     key.SetValue("header", "");
-                    webBrowser.ShowPrintPreviewDialog();
-                    //webBrowser.Print();      
+                    if (preview)
+                    {
+                        webBrowser.ShowPrintPreviewDialog();
+                    }
+                    else
+                    {
+                        webBrowser.Print();      
+                    }
                     key.SetValue("footer", old_footer);
                     key.SetValue("header", old_header);
                 }
@@ -173,7 +193,7 @@ namespace Scoring
 
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
-            Print();
+            Print(false);
         }
 
         private void WebDisplay_FormClosing(object sender, FormClosingEventArgs e)
@@ -183,6 +203,16 @@ namespace Scoring
                 e.Cancel = true;
                 this.Hide();
             }
+        }
+
+        private void toolStripButton2_Click(object sender, EventArgs e)
+        {
+            webBrowser.Refresh(WebBrowserRefreshOption.Completely);
+        }
+
+        private void toolStripButton3_Click(object sender, EventArgs e)
+        {
+            Print(true);   
         }
     }
 }
