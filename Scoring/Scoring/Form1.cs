@@ -29,7 +29,7 @@ namespace Scoring
             InitializeComponent();            
         }
 
-        WebDisplay wd = new WebDisplay();
+        WebDisplay wd = new WebDisplay("best.css");
 
         private const string GAME_FILE_PATH = "game.txt";
         private const string TEAM_FILE_PATH = "teams.txt";
