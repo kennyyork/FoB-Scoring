@@ -1,25 +1,21 @@
 ﻿<html>
 $head
 <body>
+<div id="teamRoundsHeader"><p>$team.Name</p></div>
 #foreach($round in $rounds)
 #beforeall
-<div><p>$team.Name</p></div>
-<div>
+<div id="teamRoundsTable">
 	<table>
 		<thead>
 			<tr><th>Round</th><th>Color</th></tr>
 		</thead>
 		<tbody>
-#before
-	<tr>
-#after	
-	</tr>
 #afterall		
+		</tbody>
 	</table>
-	</div>
-	
+</div>	
 #each
-	<td>$round.Number</td><td>$round.Color</td>
+			<tr><td>$round.Number</td><td>$round.Color</td></tr>
 #end
 </body>
 </html>

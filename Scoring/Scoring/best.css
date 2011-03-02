@@ -51,14 +51,21 @@ th.table_title
 	text-align: center;
 	background: green;
 	font-size: 20pt;
-}tr{	margin: 0px;}td
+}
+tr
+{
+	margin: 0px;
+}
+
+td
 {
 	border-style: solid;
 	border-width: thin;
 	border-color: black;
 	text-align: center;
 	margin: 0px;
-}td.round_plain
+}
+td.round_plain
 {
 	background-color: #99CCFF;
 	font-size: 16pt;

@@ -431,6 +431,12 @@ namespace Scoring
             wd.TeamRoundDisplay(teams[0]);
             wd.ShowDialog();
         }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            wd.UpdateCurrentRound(rounds[0], rounds[1], rounds[2]);
+            wd.ShowDialog();
+        }
     }
 
     public static class Extensions

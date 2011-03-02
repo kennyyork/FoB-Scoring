@@ -53,7 +53,7 @@ namespace Scoring
 
         public void TeamRoundDisplay(Team team)
         {
-            Template t = velocity.GetTemplate(@"templates\team_round_display.vm");
+            Template t = velocity.GetTemplate(@"templates\team_rounds_display.vm");
             VelocityContext c = new VelocityContext();
             c.Put("head", HEAD_TEMPLATE);
             c.Put("team", team);
@@ -68,7 +68,7 @@ namespace Scoring
 
         public void TeamScoreDisplay(Team team)
         {
-            Template t = velocity.GetTemplate(@"templates\team_score_display.vm");
+            Template t = velocity.GetTemplate(@"templates\team_scores_display.vm");
             VelocityContext c = new VelocityContext();
             c.Put("head", HEAD_TEMPLATE);
             c.Put("team", team);
@@ -90,7 +90,18 @@ namespace Scoring
 
         public void UpdateCurrentRound(Round current, Round next1, Round next2)
         {
-            throw new NotImplementedException();
+            Template template = velocity.GetTemplate(@"templates\last_round_scores.vm");
+            VelocityContext c = new VelocityContext();
+            c.Put("head", HEAD_TEMPLATE);
+            c.Put("current", current);
+            c.Put("next", new List<Round> { next1, next2 });            
+            
+            var scores = from t in current.Teams select new { Name = t.Name, Score = t.GetScore(current), TotalScore = t.TotalScore(current.Type) };
+            c.Put("scores", scores);
+
+            StringWriter sw = new StringWriter();
+            template.Merge(c, sw);
+            webBrowser.DocumentText = sw.GetStringBuilder().ToString();
         }
 
         private void WaitForComplete()

@@ -52,6 +52,18 @@ namespace Scoring
             rounds.Add(round);
         }
 
+        public double TotalScore(Round.Types type)
+        {
+            var result = from s in scores where s.Round.Type == type select s;
+            double sum = 0;
+            foreach (var s in result)
+            {
+                sum += s.TotalScore;
+            }
+
+            return sum;
+        }
+
         public Score GetScore(Round round)
         {
             return scores.SingleOrDefault(s => s.Round == round);

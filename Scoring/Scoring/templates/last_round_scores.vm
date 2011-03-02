@@ -1,0 +1,38 @@
+#set( $thead = "<tr><th>Round</th><th>Markers</th><th>Good Cars</th><th>Bad Cars</th><th>Good Logs</th><th>Bad Logs</th><th>Good Coal</th><th>Bad Coal</th><th>Multiplier</th><th>Score</th><th>Total Score</th></tr>" )
+
+<html>
+$head
+<body>
+<div id="lastRoundHeader">Round #$current.Number</div>
+
+#foreach( $score in $scores )
+#beforeall
+<div><table id="lastRoundTable">
+	<thead><tr><th>Team</th><th>Markers</th><th>Good Cars</th><th>Bad Cars</th><th>Good Logs</th><th>Bad Logs</th><th>Good Coal</th><th>Bad Coal</th><th>Multiplier</th><th>Score</th><th>Total Score</th></tr></thead>
+	<tbody>	
+#each
+		<tr><td>$score.Name</td><td>$score.Score.Markers</td><td>$score.Score.CarsGood</td><td>$score.Score.CarsBad</td><td>$score.Score.LogsGood</td><td>$score.Score.LogsBad</td><td>$score.Score.CoalGood</td><td>$score.Score.CoalBad</td><td>$score.Score.Multiplier</td><td>$score.Score.TotalScore</td><td>$score.TotalScore</td></tr>
+#afterall
+	</tbody>
+</table></div>
+#end	
+
+#set( $r = 1 )
+
+#foreach( $round in $next )
+#each
+<div id="round_$r">
+	<table>
+		<thead><tr><th colspan="100">Round #$round.Number</th></tr></thead>
+		<tbody>
+			<tr><td class="redCell">Red</td><td>$round.Red.Name</td></tr>
+			<tr><td class="greenCell">Green</td><td>$round.Green.Name</td></tr>
+			<tr><td class="blueCell">Blue</td><td>$round.Blue.Name</td></tr>
+			<tr><td class="yellowCell">Yellow</td><td>$round.Yellow.Name</td></tr>
+		</tbody>
+	</table>
+</div>
+#set( $r = $r + 1 )
+#end
+</body>
+</html>
