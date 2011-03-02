@@ -1,0 +1,21 @@
+﻿#set( $thead = "<tr><th>Round</th><th>Markers</th><th>Good Cars</th><th>Bad Cars</th><th>Good Logs</th><th>Bad Logs</th><th>Good Coal</th><th>Bad Coal</th><th>Multiplier</th><th>Score</th><th>Total Score</th></tr>" )
+
+<html>
+$head
+<body>
+<div>$title</div>
+<div><table>
+#foreach($section in $scores)
+#each
+	#set( $sum = 0 )
+	<tr><th colspan="100">$section.Type</th><tr>
+	$thead
+	#foreach($score in $section.Scores)
+	#each		
+		#set( $sum = $sum + $score.TotalScore )
+		<tr><td>$score.Round.Number</td><td>$score.Markers</td><td>$score.CarsGood</td><td>$score.CarsBad</td><td>$score.LogsGood</td><td>$score.LogsBad</td><td>$score.CoalGood</td><td>$score.CoalBad</td><td>$score.Multiplier</td><td>$score.TotalScore</td><td>$sum</td></tr>
+	#end
+#end
+</table>
+</body>
+</html>

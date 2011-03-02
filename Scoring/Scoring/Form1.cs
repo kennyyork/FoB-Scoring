@@ -425,6 +425,12 @@ namespace Scoring
             wd.TeamScoreDisplay(teams[0]);
             wd.ShowDialog();
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            wd.TeamRoundDisplay(teams[0]);
+            wd.ShowDialog();
+        }
     }
 
     public static class Extensions

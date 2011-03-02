@@ -18,8 +18,10 @@ namespace Scoring
     public partial class WebDisplay : Form
     {
         private readonly string pathRoot;        
-
         VelocityEngine velocity;
+
+        private readonly string HEAD_TEMPLATE;
+
         public WebDisplay()
         {                        
             InitializeComponent();
@@ -31,6 +33,7 @@ namespace Scoring
 #else 
             pathRoot = Path.GetDirectoryName(Application.ExecutablePath);
 #endif            
+            HEAD_TEMPLATE = string.Format(@"<head><link rel=""stylesheet"" type=""text/css"" href=""{0}"" media=""print,screen""/></head>", pathRoot + @"best.css");
             velocity = new VelocityEngine();
             var p = new Commons.Collections.ExtendedProperties();            
             p.AddProperty("file.resource.loader.path", new System.Collections.ArrayList(new string[] { pathRoot }));
@@ -41,8 +44,7 @@ namespace Scoring
 //        <style type=""text/css"">
 //{0}
 //</style>
-        private const string HEAD_TEMPLATE = @"<head><link rel=""stylesheet"" type=""text/css"" href=""{0}"" media=""print,screen""/></head>
-";
+        
         private string HTML_BASE = string.Empty;
 
         private const string TABLE = @"<table id=""the_table"" class=""{0}"">
@@ -69,46 +71,21 @@ namespace Scoring
             StringWriter sw = new StringWriter();
             t.Merge(c, sw);
             webBrowser.DocumentText = sw.GetStringBuilder().ToString();
-
-
-            //StringBuilder sb = new StringBuilder();
-            //sb.AppendFormat(TABLE_TITLE, title);
-            //sb.Append(ROUND_HEADER);
-            //sb.Append(TABLE_BODY_START);
-
-            //string template = withColor ? ROUND_ROW_COLOR : ROUND_ROW_NO_COLOR;
-            //foreach (var r in rounds)
-            //{
-            //    //sb.AppendFormat(ROUND_ROW, r.Number, r.Red, r.Green, r.Blue, r.Yellow);
-            //    sb.AppendFormat(template, r.Number, r.Red.Name, r.Green.Name, r.Blue.Name, r.Yellow.Name);
-            //}
-            //sb.Append(TABLE_BODY_END);
-
-            //string table = string.Format(TABLE, "round_table", sb.ToString());
-            //string document = string.Format(HTML_BASE, table);
-            //webBrowser.DocumentText = document;
         }
-
-        private const string TEAM_ROUND_HEADER = @"<tr><th class=""round_number"">Round</th><th class=""round_color"">Color</th></tr>
-";
-        private const string TEAM_ROUND_ROW = @"<tr><td class=""round_number"">{0}</td><td class=""round_{1}"">{2}</td></tr>
-";
 
         public void TeamRoundDisplay(Team team)
         {
-            StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(TABLE_TITLE, "Team Schedule: " + team.Name);
-            sb.Append(TEAM_ROUND_HEADER);
+            Template t = velocity.GetTemplate(@"templates\team_round_display.vm");
+            VelocityContext c = new VelocityContext();
+            c.Put("head", HEAD_TEMPLATE);
+            c.Put("team", team);
 
-            foreach (var r in team.Rounds)
-            {
-                string color = r.TeamColor(team);
-                sb.AppendFormat(TEAM_ROUND_ROW, r.Number, color.ToLower(), color);
-            }
+            var x = from r in team.Rounds orderby r.Number select new { Color = r.TeamColor(team), r.Number };
+            c.Put("rounds", x);
 
-            string table = string.Format(TABLE, "team_round_table", sb.ToString());
-            string document = string.Format(HTML_BASE, table);
-            webBrowser.DocumentText = document;
+            StringWriter sw = new StringWriter();
+            t.Merge(c, sw);
+            webBrowser.DocumentText = sw.GetStringBuilder().ToString();
         }
 
         private const string TEAM_SCORE_SECTION_HEADER = @"<tr><th colspan=""100"" class=""score_section"">{0}</th></tr>
@@ -120,28 +97,64 @@ namespace Scoring
 
         public void TeamScoreDisplay(Team team)
         {
-            StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(TABLE_TITLE, "Team Scores: " + team.Name);            
+            Template t = velocity.GetTemplate(@"templates\team_score_display.vm");
+            VelocityContext c = new VelocityContext();
+            c.Put("head", HEAD_TEMPLATE);
+            c.Put("team", team);
 
-            for (int i = 0; i < 4; ++i)
-            {
-                double sum = 0;
-                var scores = from s in team.Scores where s.Round.Type == (Round.Types)i orderby s.Round.Number select s;
-                if (scores.Count() > 0)
-                {
-                    sb.AppendFormat(TEAM_SCORE_SECTION_HEADER, ((Round.Types)i).ToString());
-                    sb.Append(TEAM_SCORE_HEADER);
-                    foreach (var s in scores)
+            //List<IEnumerable<Score>> scores = new List<IEnumerable<Score>>();
+            //List<Round.Types> types = new List<Round.Types> { Round.Types.Preliminary, Round.Types.Wildcard, Round.Types.Semifinals, Round.Types.Finals };                       
+            var scores = from s in team.Scores
+                    orderby s.Round.Number
+                    group s by s.Round.Type into types
+                    select new
                     {
-                        sb.AppendFormat(TEAM_SCORE_ROW, s.Round.Number, s.Markers, s.CarsGood, s.CarsBad, s.LogsGood, s.LogsBad, s.CoalGood, s.CoalBad, s.Multiplier, s.GetScore(), sum);
-                        sum += s.GetScore();
-                    }
-                }                
-            }
+                        Type = types.Key.ToString(),
+                        Scores = types
+                    };
 
-            string table = string.Format(TABLE, "team_score_table", sb.ToString());
-            string document = string.Format(HTML_BASE, table);
-            webBrowser.DocumentText = document;
+            //for (int i = 0; i < 4; ++i)
+            //{
+                
+            //    //var x = new { Type = ((Round.Types)i).ToString(), Scores = from s in team.Scores where s.Round.Type == (Round.Types)i orderby s.Round.Number select s };
+            //    //scores.Add(x);
+
+            //}
+            //var prelim = from s in team.Scores where s.Round.Type == Round.Types.Preliminary orderby s.Round.Number select s;
+            //var wildcard = from s in team.Scores where s.Round.Type == Round.Types.Wildcard orderby s.Round.Number select s;
+            //var semi = from s in team.Scores where s.Round.Type == Round.Types.Semifinals orderby s.Round.Number select s;
+            //var finals = from s in team.Scores where s.Round.Type == Round.Types.Finals orderby s.Round.Number select s;
+            
+            c.Put("scores", scores);            
+
+            StringWriter sw = new StringWriter();
+            t.Merge(c, sw);
+            webBrowser.DocumentText = sw.GetStringBuilder().ToString();
+
+            
+
+            //StringBuilder sb = new StringBuilder();
+            //sb.AppendFormat(TABLE_TITLE, "Team Scores: " + team.Name);
+
+            //for (int i = 0; i < 4; ++i)
+            //{
+            //    double sum = 0;
+            //    var scores = from s in team.Scores where s.Round.Type == (Round.Types)i orderby s.Round.Number select s;
+            //    if (scores.Count() > 0)
+            //    {
+            //        sb.AppendFormat(TEAM_SCORE_SECTION_HEADER, ((Round.Types)i).ToString());
+            //        sb.Append(TEAM_SCORE_HEADER);
+            //        foreach (var s in scores)
+            //        {
+            //            sb.AppendFormat(TEAM_SCORE_ROW, s.Round.Number, s.Markers, s.CarsGood, s.CarsBad, s.LogsGood, s.LogsBad, s.CoalGood, s.CoalBad, s.Multiplier, s.GetScore(), sum);
+            //            sum += s.GetScore();
+            //        }
+            //    }                
+            //}
+
+            //string table = string.Format(TABLE, "team_score_table", sb.ToString());
+            //string document = string.Format(HTML_BASE, table);
+            //webBrowser.DocumentText = document;
         }
 
         private const string CURRENT_ROUND_HEADER = @"<thead><td>Team</td><td>Markers</td><td>Good Cars</td><td>Bad Cars</td><td>Good Logs</td><td>Bad Logs</td><td>Good Coal</td><td>Bad Coal</td><td>Mulitplier</td><td>Score</td><td>Total</td></thead>";        

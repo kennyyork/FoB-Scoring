@@ -114,6 +114,8 @@
     <Content Include="teams.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="templates\team_score_display.vm" />
+    <None Include="templates\team_round_display.vm" />
     <None Include="templates\round_display.vm">
     </None>
   </ItemGroup>

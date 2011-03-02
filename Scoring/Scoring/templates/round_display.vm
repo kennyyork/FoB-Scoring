@@ -3,9 +3,11 @@ $head
 <body>
 #foreach($round in $rounds)
 #beforeall
+<div><p>$title</p></div>
+<div>
 	<table>
 		<thead>
-			<tr></tr>
+			<tr><th>Number</th><th>Red</th><th>Green</th><th>Blue</th><th>Yellow</th></tr>
 		</thead>
 		<tbody>
 #before
@@ -13,7 +15,8 @@ $head
 #after	
 	</tr>
 #afterall		
-	</table>			
+	</table>
+	</div>
 	
 #each
 	<td>$round.Number</td><td>$round.Red.Name</td><td>$round.Green.Name</td><td>$round.Blue.Name</td><td>$round.Yellow.Name</td>

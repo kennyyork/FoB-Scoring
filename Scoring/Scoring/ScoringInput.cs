@@ -61,8 +61,8 @@ namespace Scoring
                 cbCoalGood[i].SelectedIndex = cbCoalGood[i].Items.IndexOf(scores[i].CoalGood);
                 cbCoalBad[i].SelectedIndex = cbCoalBad[i].Items.IndexOf(scores[i].CoalBad);
                 cbMultiplier[i].SelectedIndex = cbMultiplier[i].Items.IndexOf(scores[i].Multiplier);
-                
-                lblScores[i].Text = scores[i].GetScore().ToString();
+
+                lblScores[i].Text = scores[i].TotalScore.ToString();
             }
 
             modified = false;

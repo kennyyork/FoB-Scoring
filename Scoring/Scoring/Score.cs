@@ -32,10 +32,10 @@ namespace Scoring
 
         public double Multiplier { get; set; }
 
-        public double GetScore() 
-        {
+        public double TotalScore
+        {            
             //double result = Markers * MARKER_POINTS + Math.Max(0,(CarsGood * CAR_POINTS + LogsGood * LOG_POINTS + CoalGood * COAL_POINTS) * Multiplier - (CarsBad * CAR_POINTS + LogsBad * LOG_POINTS + CoalBad * COAL_POINTS));
-            return CalcScore(Markers, CarsGood, CarsBad, LogsGood, LogsBad, CoalGood, CoalBad, Multiplier);
+            get { return CalcScore(Markers, CarsGood, CarsBad, LogsGood, LogsBad, CoalGood, CoalBad, Multiplier); }
         }
 
         public static double CalcScore(int markers, int carsGood, int carsBad, int logsGood, int logsBad, int coalGood, int coalBad, double multiplier)

@@ -40,6 +40,7 @@
             this.btnCurrentSched = new System.Windows.Forms.Button();
             this.scoringInput1 = new Scoring.ScoringInput();
             this.btnTeamScore = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudRound)).BeginInit();
             this.pnlScoreIn.SuspendLayout();
@@ -159,11 +160,22 @@
             this.btnTeamScore.UseVisualStyleBackColor = true;
             this.btnTeamScore.Click += new System.EventHandler(this.btnTeamScore_Click);
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(674, 317);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(103, 34);
+            this.button1.TabIndex = 17;
+            this.button1.Text = "View Team Schedule";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(787, 553);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.btnTeamScore);
             this.Controls.Add(this.btnCurrentSched);
             this.Controls.Add(this.pnlScoreIn);
@@ -196,6 +208,7 @@
         private System.Windows.Forms.Button btnSubmit;
         private System.Windows.Forms.Button btnCurrentSched;
         private System.Windows.Forms.Button btnTeamScore;
+        private System.Windows.Forms.Button button1;
     }
 }
 
