@@ -17,48 +17,32 @@ namespace Scoring
 {
     public partial class WebDisplay : Form
     {
-        public WebDisplay(string cssPath)
+        private readonly string pathRoot;        
+
+        VelocityEngine velocity;
+        public WebDisplay()
         {                        
             InitializeComponent();
-            ReloadCSS(cssPath);
-            VelocityEngine velocity = new VelocityEngine();
-            velocity.Init();
 
-            Template t = velocity.GetTemplate("test.vm");
-            VelocityContext c = new VelocityContext();
-            c.Put("k", 1);
-            StringWriter sw = new StringWriter();
-            t.Merge(c, sw);
-            sw.GetStringBuilder().ToString();
-        }
-
-        string cssPath;
-        public void ReloadCSS(string cssPath)
-        {
-            this.cssPath = cssPath;
-            //file:///D:/CSS/Style.css
-            string path = Path.GetDirectoryName(Application.ExecutablePath);
-            
 #if DEBUG
-            path = Path.Combine(path, "../../best.css");
-#else
-            path = Path.Combine(path, "best.css");
-#endif
-            path = @"file:///" + path;
-            
-            HTML_BASE = string.Format(HTML_TEMPLATE, path);
+            string temp = Application.ExecutablePath;
+            string[] split = Application.ExecutablePath.Split('\\');
+            pathRoot = string.Join("\\", split, 0, split.Length - 3) + "\\";
+#else 
+            pathRoot = Path.GetDirectoryName(Application.ExecutablePath);
+#endif            
+            velocity = new VelocityEngine();
+            var p = new Commons.Collections.ExtendedProperties();            
+            p.AddProperty("file.resource.loader.path", new System.Collections.ArrayList(new string[] { pathRoot }));
+            velocity.Init(p);            
         }
+        
 
 //        <style type=""text/css"">
 //{0}
 //</style>
-        private const string HTML_TEMPLATE = @"<html>
-<head>
-<link rel=""stylesheet"" type=""text/css"" href=""{0}"" media=""print,screen""/>
-</head>
-<body>{{0}}
-</body>
-</html>";
+        private const string HEAD_TEMPLATE = @"<head><link rel=""stylesheet"" type=""text/css"" href=""{0}"" media=""print,screen""/></head>
+";
         private string HTML_BASE = string.Empty;
 
         private const string TABLE = @"<table id=""the_table"" class=""{0}"">
@@ -78,22 +62,31 @@ namespace Scoring
 
         public void RoundDisplay(string title, List<Round> rounds, bool withColor)
         {
-            StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(TABLE_TITLE, title);
-            sb.Append(ROUND_HEADER);
-            sb.Append(TABLE_BODY_START);
+            Template t = velocity.GetTemplate(@"templates\round_display.vm");
+            VelocityContext c = new VelocityContext();
+            c.Put("head", HEAD_TEMPLATE);
+            c.Put("rounds",rounds);
+            StringWriter sw = new StringWriter();
+            t.Merge(c, sw);
+            webBrowser.DocumentText = sw.GetStringBuilder().ToString();
 
-            string template = withColor ? ROUND_ROW_COLOR : ROUND_ROW_NO_COLOR;
-            foreach (var r in rounds)
-            {
-                //sb.AppendFormat(ROUND_ROW, r.Number, r.Red, r.Green, r.Blue, r.Yellow);
-                sb.AppendFormat(template, r.Number, r.Red.Name, r.Green.Name, r.Blue.Name, r.Yellow.Name);
-            }
-            sb.Append(TABLE_BODY_END);
 
-            string table = string.Format(TABLE, "round_table", sb.ToString());
-            string document = string.Format(HTML_BASE, table);
-            webBrowser.DocumentText = document;
+            //StringBuilder sb = new StringBuilder();
+            //sb.AppendFormat(TABLE_TITLE, title);
+            //sb.Append(ROUND_HEADER);
+            //sb.Append(TABLE_BODY_START);
+
+            //string template = withColor ? ROUND_ROW_COLOR : ROUND_ROW_NO_COLOR;
+            //foreach (var r in rounds)
+            //{
+            //    //sb.AppendFormat(ROUND_ROW, r.Number, r.Red, r.Green, r.Blue, r.Yellow);
+            //    sb.AppendFormat(template, r.Number, r.Red.Name, r.Green.Name, r.Blue.Name, r.Yellow.Name);
+            //}
+            //sb.Append(TABLE_BODY_END);
+
+            //string table = string.Format(TABLE, "round_table", sb.ToString());
+            //string document = string.Format(HTML_BASE, table);
+            //webBrowser.DocumentText = document;
         }
 
         private const string TEAM_ROUND_HEADER = @"<tr><th class=""round_number"">Round</th><th class=""round_color"">Color</th></tr>
@@ -156,15 +149,15 @@ namespace Scoring
         
         public void UpdateCurrentRound(Round current, Round next1, Round next2)
         {
-            HtmlBuilder html = new HtmlBuilder();
-            html.LinkCSS(cssPath);
-            using (var body = html.WriteTag("body",null))
-            {
-                using (var table = html.WriteTag("table", null))
-                {
-                    //using var 
-                }
-            }
+            //HtmlBuilder html = new HtmlBuilder();
+            //html.LinkCSS(cssPath);
+            //using (var body = html.WriteTag("body",null))
+            //{
+            //    using (var table = html.WriteTag("table", null))
+            //    {
+            //        //using var 
+            //    }
+            //}
             //StringBuilder sb = new StringBuilder();
             //sb.AppendFormat(TABLE_TITLE, "Round #" + current.Number.ToString());
             //sb.Append(TABLE_BODY_START);

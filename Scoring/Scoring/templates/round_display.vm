@@ -1,0 +1,22 @@
+<html>
+$head
+<body>
+#foreach($round in $rounds)
+#beforeall
+	<table>
+		<thead>
+			<tr></tr>
+		</thead>
+		<tbody>
+#before
+	<tr>
+#after	
+	</tr>
+#afterall		
+	</table>			
+	
+#each
+	<td>$round.Number</td><td>$round.Red.Name</td><td>$round.Green.Name</td><td>$round.Blue.Name</td><td>$round.Yellow.Name</td>
+#end
+</body>
+</html>
