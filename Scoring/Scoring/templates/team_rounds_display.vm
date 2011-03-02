@@ -1,5 +1,7 @@
 ﻿<html>
-$head
+</head>
+	$css	
+</head>
 <body>
 <div id="teamRoundsHeader"><p>$team.Name</p></div>
 #foreach($round in $rounds)

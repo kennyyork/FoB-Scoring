@@ -1,5 +1,7 @@
 <html>
-$head
+</head>
+	$css	
+</head>
 <body>
 <div id="roundDisplayHeader"><p>$title</p></div>
 #foreach($round in $rounds)

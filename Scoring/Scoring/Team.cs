@@ -6,12 +6,22 @@ using System.IO;
 
 namespace Scoring
 {
-    public class Team
+    public class Team : System.ComponentModel.INotifyPropertyChanged
     {
         public string Name { get; private set; }
         public int Number { get; private set; }
         public int LastRound { get; private set; }
-        public double Notebook { get; set; }
+        private double notebook;
+
+        public double Notebook 
+        {
+            get { return notebook; }
+            set
+            {
+                notebook = value;
+                NotifyPropertyChanged("Notebook");
+            }
+        }
 
         public List<Round> Rounds { get { return rounds; } }
         public List<Score> Scores { get { return scores; } }
@@ -81,49 +91,26 @@ namespace Scoring
             return t;
         }
 
-        //public static List<Team> ReadAll(string path)
-        //{
-        //    if (!File.Exists(path))
-        //    {
-        //        return null;
-        //    }
+        public void Clear()
+        {
+            LastRound = -1;
+            rounds.Clear();
+            scores.Clear();
+        }
 
-        //    List<Team> teams = new List<Team>();
+        #region INotifyPropertyChanged Members
 
-        //    try
-        //    {                
-        //        StreamReader sr = File.OpenText(path);
-        //        string line;
-        //        while ((line = sr.ReadLine()) != null)
-        //        {
-        //            string[] split = line.Split(',');
-        //            Team t = new Team(split[1], int.Parse(split[0]));
-        //            teams.Add(t);
-        //        }
-        //    }
-        //    catch
-        //    {
-        //        throw;
-        //    }
-            
-        //    return teams;
-        //}
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
 
-        //public static void WriteAll(string path, IEnumerable<Team> teams)
-        //{
-        //    try
-        //    {
-        //        var fs = File.OpenWrite(path);
-        //        StreamWriter sr = new StreamWriter(fs);
-        //        foreach (var t in teams)
-        //        {
-        //            sr.WriteLine("{0},{1}", t.Number, t.Name);
-        //        }
-        //    }
-        //    catch
-        //    {
-        //        throw;
-        //    }            
-        //}
+        public void NotifyPropertyChanged(string name)
+        {
+            var p = PropertyChanged;
+            if (p != null)
+            {
+                PropertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(name));
+            }
+        }
+
+        #endregion
     }
 }

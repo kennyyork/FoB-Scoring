@@ -20,7 +20,7 @@ namespace Scoring
         private readonly string pathRoot;        
         VelocityEngine velocity;
 
-        private readonly string HEAD_TEMPLATE;
+        private readonly string cssReference;
 
         public WebDisplay()
         {                        
@@ -30,13 +30,14 @@ namespace Scoring
             string temp = Application.ExecutablePath;
             string[] split = Application.ExecutablePath.Split('\\');
             pathRoot = string.Join("\\", split, 0, split.Length - 3) + "\\";
+            cssReference = string.Format(@"<link rel=""stylesheet"" type=""text/css"" href=""{0}"" media=""print,screen""/>", pathRoot + @"\html\best.css");
 #else 
             pathRoot = Path.GetDirectoryName(Application.ExecutablePath);
-#endif            
-            HEAD_TEMPLATE = string.Format(@"<head><link rel=""stylesheet"" type=""text/css"" href=""{0}"" media=""print,screen""/></head>", pathRoot + @"best.css");
+            cssReference = string.Format(@"<link rel=""stylesheet"" type=""text/css"" href=""{0}"" media=""print,screen""/>", @"best.css");
+#endif
             velocity = new VelocityEngine();
             var p = new Commons.Collections.ExtendedProperties();            
-            p.AddProperty("file.resource.loader.path", new System.Collections.ArrayList(new string[] { pathRoot }));
+            p.AddProperty("file.resource.loader.path", new System.Collections.ArrayList(new string[] { pathRoot }));            
             velocity.Init(p);            
         }
         
@@ -44,8 +45,9 @@ namespace Scoring
         {
             Template t = velocity.GetTemplate(@"templates\round_display.vm");
             VelocityContext c = new VelocityContext();
-            c.Put("head", HEAD_TEMPLATE);
+            c.Put("css", cssReference);
             c.Put("rounds",rounds);
+            c.Put("title", title);
             StringWriter sw = new StringWriter();
             t.Merge(c, sw);
             webBrowser.DocumentText = sw.GetStringBuilder().ToString();
@@ -55,7 +57,7 @@ namespace Scoring
         {
             Template t = velocity.GetTemplate(@"templates\team_rounds_display.vm");
             VelocityContext c = new VelocityContext();
-            c.Put("head", HEAD_TEMPLATE);
+            c.Put("css", cssReference);
             c.Put("team", team);
 
             var x = from r in team.Rounds orderby r.Number select new { Color = r.TeamColor(team), r.Number };
@@ -70,7 +72,7 @@ namespace Scoring
         {
             Template t = velocity.GetTemplate(@"templates\team_scores_display.vm");
             VelocityContext c = new VelocityContext();
-            c.Put("head", HEAD_TEMPLATE);
+            c.Put("css", cssReference);
             c.Put("team", team);
 
             var scores = from s in team.Scores
@@ -84,23 +86,56 @@ namespace Scoring
            c.Put("scores", scores);            
 
             StringWriter sw = new StringWriter();
-            t.Merge(c, sw);
+            t.Merge(c, sw);            
             webBrowser.DocumentText = sw.GetStringBuilder().ToString();
         }
 
-        public void UpdateCurrentRound(Round current, Round next1, Round next2)
+        public void UpdateLastRoundDisplay(Round current, Round next1, Round next2)
         {
             Template template = velocity.GetTemplate(@"templates\last_round_scores.vm");
             VelocityContext c = new VelocityContext();
-            c.Put("head", HEAD_TEMPLATE);
-            c.Put("current", current);
-            c.Put("next", new List<Round> { next1, next2 });            
-            
-            var scores = from t in current.Teams select new { Name = t.Name, Score = t.GetScore(current), TotalScore = t.TotalScore(current.Type) };
-            c.Put("scores", scores);
+            c.Put("css", cssReference);
 
+            if (current != null)
+            {
+                var scores = from t in current.Teams select new { Name = t.Name, Score = t.GetScore(current), TotalScore = t.TotalScore(current.Type) };
+                c.Put("current", current);
+                c.Put("scores", scores);
+            }
+            else
+            {
+                List<object> scores = new List<object>();
+                scores.Add(new object());
+                scores.Add(scores[0]);
+                scores.Add(scores[0]);
+                scores.Add(scores[0]);
+                c.Put("scores", scores);
+            }
+
+            System.Collections.ArrayList list = new System.Collections.ArrayList();
+            if (next1 != null)
+            {
+                list.Add(new { Number = next1.Number, Red = next1.Red.Name, Green = next1.Green.Name, Blue = next1.Blue.Name, Yellow = next1.Yellow.Name });
+            }
+            else
+            {
+                list.Add(new { Number = 0, Red = string.Empty, Green = string.Empty, Blue = string.Empty, Yellow = string.Empty });
+            }
+
+            if (next2 != null)
+            {
+                list.Add(new { Number = next2.Number, Red = next2.Red.Name, Green = next2.Green.Name, Blue = next2.Blue.Name, Yellow = next2.Yellow.Name });
+            }
+            else
+            {
+                list.Add(new { Number = 0, Red = string.Empty, Green = string.Empty, Blue = string.Empty, Yellow = string.Empty });
+            }
+
+            c.Put("next", list);
+            
             StringWriter sw = new StringWriter();
             template.Merge(c, sw);
+            File.WriteAllText(@"html\last_round_display.html", sw.GetStringBuilder().ToString());
             webBrowser.DocumentText = sw.GetStringBuilder().ToString();
         }
 

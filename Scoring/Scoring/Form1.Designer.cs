@@ -38,10 +38,10 @@
             this.pnlScoreIn = new System.Windows.Forms.Panel();
             this.btnSubmit = new System.Windows.Forms.Button();
             this.btnCurrentSched = new System.Windows.Forms.Button();
-            this.scoringInput1 = new Scoring.ScoringInput();
             this.btnTeamScore = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
+            this.scoringInput1 = new Scoring.ScoringInput();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudRound)).BeginInit();
             this.pnlScoreIn.SuspendLayout();
@@ -65,6 +65,7 @@
             this.btnWildcard.TabIndex = 7;
             this.btnWildcard.Text = "Generate Wildcard";
             this.btnWildcard.UseVisualStyleBackColor = true;
+            this.btnWildcard.Click += new System.EventHandler(this.btnWildcard_Click);
             // 
             // btnSemi
             // 
@@ -105,6 +106,7 @@
             this.btnNotebook.TabIndex = 11;
             this.btnNotebook.Text = "Enter Notebooks";
             this.btnNotebook.UseVisualStyleBackColor = true;
+            this.btnNotebook.Click += new System.EventHandler(this.btnNotebook_Click);
             // 
             // nudRound
             // 
@@ -144,13 +146,6 @@
             this.btnCurrentSched.UseVisualStyleBackColor = true;
             this.btnCurrentSched.Click += new System.EventHandler(this.btnCurrentSched_Click);
             // 
-            // scoringInput1
-            // 
-            this.scoringInput1.Location = new System.Drawing.Point(12, 12);
-            this.scoringInput1.Name = "scoringInput1";
-            this.scoringInput1.Size = new System.Drawing.Size(650, 180);
-            this.scoringInput1.TabIndex = 5;
-            // 
             // btnTeamScore
             // 
             this.btnTeamScore.Location = new System.Drawing.Point(674, 277);
@@ -180,6 +175,13 @@
             this.button2.Text = "Update Round Display";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
+            // scoringInput1
+            // 
+            this.scoringInput1.Location = new System.Drawing.Point(12, 12);
+            this.scoringInput1.Name = "scoringInput1";
+            this.scoringInput1.Size = new System.Drawing.Size(650, 180);
+            this.scoringInput1.TabIndex = 5;
             // 
             // Form1
             // 
