@@ -3,11 +3,11 @@
 	$css	
 </head>
 <body>
-<div id="roundDisplayHeader"><p>$title</p></div>
+<div class="mainHeader" id="roundDisplayHeader"><p>$title</p></div>
 #foreach($round in $rounds)
 #beforeall
-<div id="roundDislayTable">
-	<table>
+<div class="roundDisplay">
+	<table id="roundDislayTable">
 		<thead>
 			<tr><th>Number</th><th>Red</th><th>Green</th><th>Blue</th><th>Yellow</th></tr>
 		</thead>
@@ -17,7 +17,7 @@
 	</table>
 </div>	
 #each
-			<tr><td>$round.Number</td><td>$round.Red.Name</td><td>$round.Green.Name</td><td>$round.Blue.Name</td><td>$round.Yellow.Name</td></tr>
+			<tr><td>$round.Number</td><td class="redCell">$round.Red.Name</td><td class="greenCell">$round.Green.Name</td><td class="blueCell">$round.Blue.Name</td><td class="yellowCell">$round.Yellow.Name</td></tr>
 #end
 </body>
 </html>

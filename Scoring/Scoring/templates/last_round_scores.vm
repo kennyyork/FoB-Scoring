@@ -5,15 +5,16 @@
 	$css		
 </head>
 <body>
-<div id="lastRoundHeader">#if($current.Number)Round #$current.Number#end</div>
+<div class="mainHeader"><p id="lastRoundHeader">Round#if($!current.Number) #$current.Number#end</p></div>
 
 #foreach( $score in $scores )
 #beforeall
-<div><table id="lastRoundTable">
-	<thead><tr><th>Team</th><th>Markers</th><th>Good Cars</th><th>Bad Cars</th><th>Good Logs</th><th>Bad Logs</th><th>Good Coal</th><th>Bad Coal</th><th>Multiplier</th><th>Score</th><th>Total Score</th></tr></thead>
+<div class="scoreDisplay">
+<table id="lastRoundTable">
+	<thead><tr><th>Team</th><th>Markers</th><th>Good Cars</th><th>Bad Cars</th><th>Good Logs</th><th>Bad Logs</th><th>Good Coal</th><th>Bad Coal</th><th>Multiplier</th><th>Score</th><th class="totalScore">Total Score</th></tr></thead>
 	<tbody>	
 #each
-		<tr><td>$!score.Name</td><td>$!score.Score.Markers</td><td>$!score.Score.CarsGood</td><td>$!score.Score.CarsBad</td><td>$!score.Score.LogsGood</td><td>$!score.Score.LogsBad</td><td>$!score.Score.CoalGood</td><td>$!score.Score.CoalBad</td><td>$!score.Score.Multiplier</td><td>$!score.Score.TotalScore</td><td>$!score.TotalScore</td></tr>
+		<tr><td>$!score.Name</td><td>$!score.Score.Markers</td><td>$!score.Score.CarsGood</td><td>$!score.Score.CarsBad</td><td>$!score.Score.LogsGood</td><td>$!score.Score.LogsBad</td><td>$!score.Score.CoalGood</td><td>$!score.Score.CoalBad</td><td>$!score.Score.Multiplier</td><td>$!score.Score.TotalScore</td><td class="totalScore">$!score.TotalScore</td></tr>
 #afterall
 	</tbody>
 </table></div>
@@ -23,8 +24,8 @@
 
 #foreach( $round in $next )
 #each
-<div id="round_$r">
-	<table>
+<div class="nextRound">
+	<table id="round_$r">
 		<thead><tr><th colspan="100">#if($round.Number > 0)Round #$round.Number#end</th></tr></thead>
 		<tbody>
 			<tr><td class="redCell">Red</td><td>$round.Red</td></tr>

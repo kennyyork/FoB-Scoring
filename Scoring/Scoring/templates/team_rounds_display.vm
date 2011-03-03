@@ -3,11 +3,11 @@
 	$css	
 </head>
 <body>
-<div id="teamRoundsHeader"><p>$team.Name</p></div>
+<div class="mainHeader" id="teamRoundsHeader"><p>$team.Name</p></div>
 #foreach($round in $rounds)
 #beforeall
-<div id="teamRoundsTable">
-	<table>
+<div class="roundDisplay">
+	<table id="teamRoundsTable">
 		<thead>
 			<tr><th>Round</th><th>Color</th></tr>
 		</thead>

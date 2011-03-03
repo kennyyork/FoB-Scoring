@@ -23,11 +23,6 @@ th
 	border-bottom: 2px solid;
 }
 
-/*#the_table tbody
-{
-	background: #e8edff;
-}*/
-
 tr
 {
 	page-break-inside: avoid;
@@ -41,38 +36,46 @@ td
 	border-right: 1px solid;
 }
 
-/*table
+.scoreDisplay table
 {
-	width:100%
+	width: 95%;
+	margin: auto;
 }
 
-th.table_title
+.nextRound table
 {
-	text-align: center;
-	background: green;
-	font-size: 20pt;
-}
-tr
-{
-	margin: 0px;
+    float: left;
+    width: 20%;
 }
 
-td
+#round_1
 {
-	border-style: solid;
-	border-width: thin;
-	border-color: black;
-	text-align: center;
-	margin: 0px;
-}
-td.round_plain
-{
-	background-color: #99CCFF;
-	font-size: 16pt;
-}
-td.round_number
-{
-	background-color: #C0C0C0;
+	position:absolute;
+	left: 10%;
 }
 
-*/
+#round_2
+{
+	position:absolute;
+	right:10%;
+}
+
+.redCell
+{
+	background:Red;
+}
+
+.blueCell
+{
+	background:blue;
+}
+
+.greenCell
+{
+	background:green;
+}
+
+.yellowCell
+{
+	background:yellow;
+}

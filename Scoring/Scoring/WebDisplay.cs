@@ -30,7 +30,7 @@ namespace Scoring
             string temp = Application.ExecutablePath;
             string[] split = Application.ExecutablePath.Split('\\');
             pathRoot = string.Join("\\", split, 0, split.Length - 3) + "\\";
-            cssReference = string.Format(@"<link rel=""stylesheet"" type=""text/css"" href=""{0}"" media=""print,screen""/>", pathRoot + @"\html\best.css");
+            cssReference = string.Format(@"<link rel=""stylesheet"" type=""text/css"" href=""file:///{0}"" media=""print,screen""/>", pathRoot + @"\html\best.css");
 #else 
             pathRoot = Path.GetDirectoryName(Application.ExecutablePath);
             cssReference = string.Format(@"<link rel=""stylesheet"" type=""text/css"" href=""{0}"" media=""print,screen""/>", @"best.css");
