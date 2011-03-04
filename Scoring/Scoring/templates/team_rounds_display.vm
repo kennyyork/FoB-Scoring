@@ -1,8 +1,9 @@
 ﻿<html>
 </head>
-	$css	
+	<script type="text/javascript" src="$script"></script>
+	<link rel="stylesheet" type="text/css" href="$css"/>		
 </head>
-<body>
+<body onload="onLoad()">
 <div class="mainHeader" id="teamRoundsHeader"><p>$team.Name</p></div>
 #foreach($round in $rounds)
 #beforeall

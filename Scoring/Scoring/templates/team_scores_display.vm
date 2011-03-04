@@ -1,9 +1,10 @@
 ﻿#set( $thead = "<tr><th>Round</th><th>Markers</th><th>Good Cars</th><th>Bad Cars</th><th>Good Logs</th><th>Bad Logs</th><th>Good Coal</th><th>Bad Coal</th><th>Multiplier</th><th>Score</th><th class="totalScore">Total Score</th></tr>" )
 <html>
 </head>
-	$css	
+	<script type="text/javascript" src="$script"></script>
+	<link rel="stylesheet" type="text/css" href="$css"/>		
 </head>
-<body>
+<body onload="onLoad()">
 <div class="mainHeader" id="teamScoresHeader">$title</div>
 #foreach($section in $scores)
 #beforeall

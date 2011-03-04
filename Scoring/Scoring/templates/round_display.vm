@@ -1,15 +1,16 @@
 <html>
 </head>
-	$css	
+	<script type="text/javascript" src="$script"></script>
+	<link rel="stylesheet" type="text/css" href="$css"/>		
 </head>
-<body>
+<body onload="onLoad()">
 <div class="mainHeader" id="roundDisplayHeader"><p>$title</p></div>
 #foreach($round in $rounds)
 #beforeall
 <div class="roundDisplay">
 	<table id="roundDislayTable">
 		<thead>
-			<tr><th>Number</th><th>Red</th><th>Green</th><th>Blue</th><th>Yellow</th></tr>
+			<tr><th>Number</th><th class="redCell">Red</th><th class="greenCell">Green</th><th class="blueCell">Blue</th><th class="yellowCell">Yellow</th></tr>
 		</thead>
 		<tbody>
 #afterall
@@ -17,7 +18,7 @@
 	</table>
 </div>	
 #each
-			<tr><td>$round.Number</td><td class="redCell">$round.Red.Name</td><td class="greenCell">$round.Green.Name</td><td class="blueCell">$round.Blue.Name</td><td class="yellowCell">$round.Yellow.Name</td></tr>
+			<tr><td>$round.Number</td><td>$round.Red.Name</td><td>$round.Green.Name</td><td>$round.Blue.Name</td><td>$round.Yellow.Name</td></tr>
 #end
 </body>
 </html>

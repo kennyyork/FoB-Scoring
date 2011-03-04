@@ -60,22 +60,53 @@ td
 	right:10%;
 }
 
-.redCell
+.overallDisplayInner
 {
-	background:Red;
+	float: left;
+	width: 48%;
+	margin-left: 1%;
+	margin-right: 1%;	
 }
 
-.blueCell
+.overallDisplayInner table,tr,td,th
 {
-	background:blue;
+	font-size: 30px;
 }
 
-.greenCell
+.overallPlace
 {
-	background:green;
+	width: 1%;
 }
 
-.yellowCell
+.overallScore
 {
-	background:yellow;
+	width: 4%;
+}
+
+@media print
+{
+	
+}
+
+@media screen
+{
+	.redCell
+	{
+		background:Red;
+	}
+
+	.blueCell
+	{
+		background:blue;
+	}
+
+	.greenCell
+	{
+		background:green;
+	}
+
+	.yellowCell
+	{
+		background:yellow;
+	}
 }

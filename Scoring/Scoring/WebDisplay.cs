@@ -16,48 +16,51 @@ using NVelocity.Context;
 namespace Scoring
 {
     public partial class WebDisplay : Form
-    {
-        private readonly string pathRoot;        
+    {             
         VelocityEngine velocity;
+        VelocityContext baseContext; 
 
-        private readonly string cssReference;
+        private readonly string cssFile;
+        private readonly string scriptFile;
 
         public WebDisplay()
         {                        
             InitializeComponent();
-
+            webBrowser.ScriptErrorsSuppressed = true;
 #if DEBUG
             string temp = Application.ExecutablePath;
             string[] split = Application.ExecutablePath.Split('\\');
-            pathRoot = string.Join("\\", split, 0, split.Length - 3) + "\\";
-            cssReference = string.Format(@"<link rel=""stylesheet"" type=""text/css"" href=""file:///{0}"" media=""print,screen""/>", pathRoot + @"\html\best.css");
+            string pathRoot = string.Join("\\", split, 0, split.Length - 3);
+            cssFile = string.Format(@"file:///{0}\html\best.css", pathRoot);
+            scriptFile = string.Format(@"file:///{0}\html\scripts.js", pathRoot);
 #else 
-            pathRoot = Path.GetDirectoryName(Application.ExecutablePath);
-            cssReference = string.Format(@"<link rel=""stylesheet"" type=""text/css"" href=""{0}"" media=""print,screen""/>", @"best.css");
+            cssFile = "best.css";
+            scriptFile = "scripts.js";            
 #endif
             velocity = new VelocityEngine();
             var p = new Commons.Collections.ExtendedProperties();            
             p.AddProperty("file.resource.loader.path", new System.Collections.ArrayList(new string[] { pathRoot }));            
-            velocity.Init(p);            
+            velocity.Init(p);
+            baseContext = new VelocityContext();
+            baseContext.Put("script", scriptFile);
+            baseContext.Put("css", cssFile);
         }
         
-        public void RoundDisplay(string title, List<Round> rounds, bool withColor)
+        public void RoundDisplay(string title, IEnumerable<Round> rounds)
         {
             Template t = velocity.GetTemplate(@"templates\round_display.vm");
-            VelocityContext c = new VelocityContext();
-            c.Put("css", cssReference);
+            VelocityContext c = new VelocityContext(baseContext);            
             c.Put("rounds",rounds);
             c.Put("title", title);
             StringWriter sw = new StringWriter();
-            t.Merge(c, sw);
+            t.Merge(c, sw);            
             webBrowser.DocumentText = sw.GetStringBuilder().ToString();
         }
 
         public void TeamRoundDisplay(Team team)
         {
             Template t = velocity.GetTemplate(@"templates\team_rounds_display.vm");
-            VelocityContext c = new VelocityContext();
-            c.Put("css", cssReference);
+            VelocityContext c = new VelocityContext(baseContext);
             c.Put("team", team);
 
             var x = from r in team.Rounds orderby r.Number select new { Color = r.TeamColor(team), r.Number };
@@ -71,8 +74,7 @@ namespace Scoring
         public void TeamScoreDisplay(Team team)
         {
             Template t = velocity.GetTemplate(@"templates\team_scores_display.vm");
-            VelocityContext c = new VelocityContext();
-            c.Put("css", cssReference);
+            VelocityContext c = new VelocityContext(baseContext);            
             c.Put("team", team);
 
             var scores = from s in team.Scores
@@ -90,11 +92,10 @@ namespace Scoring
             webBrowser.DocumentText = sw.GetStringBuilder().ToString();
         }
 
-        public void UpdateLastRoundDisplay(Round current, Round next1, Round next2)
+        public void LastRoundDisplay(Round current, Round next1, Round next2)
         {
             Template template = velocity.GetTemplate(@"templates\last_round_scores.vm");
-            VelocityContext c = new VelocityContext();
-            c.Put("css", cssReference);
+            VelocityContext c = new VelocityContext(baseContext);            
 
             if (current != null)
             {
@@ -119,24 +120,70 @@ namespace Scoring
             }
             else
             {
-                list.Add(new { Number = 0, Red = string.Empty, Green = string.Empty, Blue = string.Empty, Yellow = string.Empty });
+                list.Add(new object());
             }
 
             if (next2 != null)
             {
-                list.Add(new { Number = next2.Number, Red = next2.Red.Name, Green = next2.Green.Name, Blue = next2.Blue.Name, Yellow = next2.Yellow.Name });
+                list.Add(new { Number = next1.Number, Red = next1.Red.Name, Green = next1.Green.Name, Blue = next1.Blue.Name, Yellow = next1.Yellow.Name });
             }
             else
             {
-                list.Add(new { Number = 0, Red = string.Empty, Green = string.Empty, Blue = string.Empty, Yellow = string.Empty });
+                list.Add(new object());
             }
 
             c.Put("next", list);
             
             StringWriter sw = new StringWriter();
-            template.Merge(c, sw);
-            File.WriteAllText(@"html\last_round_display.html", sw.GetStringBuilder().ToString());
+            template.Merge(c, sw);            
             webBrowser.DocumentText = sw.GetStringBuilder().ToString();
+        }
+
+        public void OverallScoresDisplay(IEnumerable<Team> teams, Round.Types type)
+        {
+            Template template = velocity.GetTemplate(@"templates\overall_scores.vm");
+            
+
+            var scores = (from t in teams orderby t.TotalScore(type) descending select new TempScore { Name = t.Name, Score = t.TotalScore(type) }).ToList();
+            
+            int place = 1;
+            int count = 1;
+            double last = double.MaxValue;
+
+            foreach (var t in scores)
+            {
+                if (t.Score == last)
+                {
+                    t.Place = place;
+                }
+                else
+                {
+                    t.Place = count;
+                    place = count;
+                    last = t.Score;
+                }
+
+                ++count;
+            }
+
+            int total = scores.Count;
+            for (int i = 0; i < total; i += 16)
+            {
+                VelocityContext c = new VelocityContext(baseContext);
+                var section = scores.Skip(i).Take(16).ToList();                
+                c.Put("teams", section);
+                StringWriter sw = new StringWriter();
+                template.Merge(c, sw);
+
+                File.WriteAllText(string.Format(@"html\overall_scores_{0}.html", i % 16), sw.ToString());
+            }
+        }
+
+        private class TempScore
+        {
+            public string Name { get; set; }
+            public int Place { get; set; }
+            public double Score { get; set; }
         }
 
         private void WaitForComplete()
@@ -210,6 +257,16 @@ namespace Scoring
         private void toolStripButton3_Click(object sender, EventArgs e)
         {
             Print(true);   
+        }
+
+        private void saveToolStripButton_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = "HTML files (*.html)|*.html";
+            if (DialogResult.OK == sfd.ShowDialog())
+            {                
+                File.WriteAllText(sfd.FileName, webBrowser.DocumentText);
+            }
         }
     }
 }

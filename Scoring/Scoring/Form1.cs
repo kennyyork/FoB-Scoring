@@ -406,7 +406,7 @@ namespace Scoring
                     next2 = rounds[round + 2];
                 }
 
-                wd.UpdateLastRoundDisplay(rounds[round], next1, next2);
+                wd.LastRoundDisplay(rounds[round], next1, next2);
                 wd.Show();
                 
                 ++activeRound;
@@ -450,6 +450,9 @@ namespace Scoring
 
         private void btnCurrentSched_Click(object sender, EventArgs e)
         {
+            wd.OverallScoresDisplay(teams, Round.Types.Preliminary);
+            wd.ShowDialog();
+
             IEnumerable<Round> result = null;
             string title = string.Empty;
 
@@ -463,8 +466,8 @@ namespace Scoring
 
             if (result != null && result.Count() > 0)
             {
-                wd.RoundDisplay(title, result.ToList(), false);
-                wd.Show();
+                wd.RoundDisplay(title, result);
+                wd.WriteHTML(@"html\last_round.html");                
             }
         }
 
@@ -482,7 +485,7 @@ namespace Scoring
 
         private void button2_Click(object sender, EventArgs e)
         {
-            wd.UpdateLastRoundDisplay(null, rounds[1], null);
+            wd.LastRoundDisplay(null, rounds[1], null);
             wd.ShowDialog();
         }
 

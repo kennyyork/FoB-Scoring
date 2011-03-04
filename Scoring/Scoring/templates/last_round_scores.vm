@@ -1,10 +1,10 @@
 #set( $thead = "<tr><th>Round</th><th>Markers</th><th>Good Cars</th><th>Bad Cars</th><th>Good Logs</th><th>Bad Logs</th><th>Good Coal</th><th>Bad Coal</th><th>Multiplier</th><th>Score</th><th>Total Score</th></tr>" )
 <html>
 </head>
-	<META HTTP-EQUIV="REFRESH" CONTENT="5">
-	$css		
+	<script type="text/javascript" src="$script"></script>
+	<link rel="stylesheet" type="text/css" href="$css"/>		
 </head>
-<body>
+<body onload="onLoad()">
 <div class="mainHeader"><p id="lastRoundHeader">Round#if($!current.Number) #$current.Number#end</p></div>
 
 #foreach( $score in $scores )
@@ -28,10 +28,10 @@
 	<table id="round_$r">
 		<thead><tr><th colspan="100">#if($round.Number > 0)Round #$round.Number#end</th></tr></thead>
 		<tbody>
-			<tr><td class="redCell">Red</td><td>$round.Red</td></tr>
-			<tr><td class="greenCell">Green</td><td>$round.Green</td></tr>
-			<tr><td class="blueCell">Blue</td><td>$round.Blue</td></tr>
-			<tr><td class="yellowCell">Yellow</td><td>$round.Yellow</td></tr>
+			<tr><td class="redCell">Red</td><td>$!round.Red</td></tr>
+			<tr><td class="greenCell">Green</td><td>$!round.Green</td></tr>
+			<tr><td class="blueCell">Blue</td><td>$!round.Blue</td></tr>
+			<tr><td class="yellowCell">Yellow</td><td>$!round.Yellow</td></tr>
 		</tbody>
 	</table>
 </div>

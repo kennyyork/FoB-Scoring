@@ -1,0 +1,27 @@
+<html>
+</head>
+	<script type="text/javascript" src="$script"></script>
+	<link rel="stylesheet" type="text/css" href="$css"/>		
+</head>
+<body onload="onLoad()">
+<div class="mainHeader"><p id="overallScoresHeader">Current Scores</p></div>
+
+#foreach( $team in $teams )
+#beforeall
+<div class="overallDisplay">
+#each
+#if( $velocityCount % 8 == 1 )
+<div class="overallDisplayInner"><table>
+	<thead><tr><th class="overallPlace">Place</th><th>Team</th><th class="overallScore">Score</th></tr></thead>
+	<tbody>	
+#end
+		<tr><td class="overallPlace">$!team.Place</td><td>$!team.Name</td><td class="overallScore">$!team.Score</td></tr>
+#if( $velocityCount % 8 == 0 )
+	</tbody>
+</table></div>
+#end		
+#afterall
+</div>
+#end	
+</body>
+</html>
