@@ -81,13 +81,17 @@ namespace Scoring
 
         public override string ToString()
         {
-            return string.Format("{0},{1}", Number, Name);
+            return string.Format("{0},{1},{2}", Number, Name, Notebook);
         }
 
         public static Team FromString(string line)
         {
             string[] split = line.Split(',');
             Team t = new Team(split[1], int.Parse(split[0]));
+            if (split.Length == 3)
+            {
+                t.Notebook = int.Parse(split[2]);
+            }
             return t;
         }
 

@@ -66,9 +66,13 @@
             this.ClientSize = new System.Drawing.Size(353, 406);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.dataGridView);
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "NotebookEntry";
+            this.ShowInTaskbar = false;
             this.Text = "NotebookEntry";
             this.Load += new System.EventHandler(this.NotebookEntry_Load);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.NotebookEntry_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).EndInit();
             this.ResumeLayout(false);
 

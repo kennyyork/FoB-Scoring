@@ -10,14 +10,13 @@ using System.Windows.Forms;
 namespace Scoring
 {
     public partial class NotebookEntry : Form
-    {
-        private BindingList<Team> teams;
-        private BindingSource bindingSource;
+    {        
+        private List<Team> teams;
 
         public NotebookEntry(List<Team> teams)
         {
             if (teams == null) throw new ArgumentNullException();
-            this.teams = new BindingList<Team>(teams);
+            this.teams = teams;
 
             InitializeComponent();            
         }
@@ -35,10 +34,21 @@ namespace Scoring
 
             dataGridView.DataSource = teams;
         }
-
+        
         private void btnOk_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void NotebookEntry_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            using (System.IO.StreamWriter sw = new System.IO.StreamWriter(System.IO.File.Open("teams.txt", System.IO.FileMode.Create)))
+            {
+                foreach (var t in teams)
+                {
+                    sw.WriteLine(t);
+                }
+            }
         }
     }
 }

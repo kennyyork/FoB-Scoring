@@ -75,6 +75,7 @@
             this.btnSemi.TabIndex = 8;
             this.btnSemi.Text = "Generate Semi-Finals";
             this.btnSemi.UseVisualStyleBackColor = true;
+            this.btnSemi.Click += new System.EventHandler(this.btnSemi_Click);
             // 
             // btnFinals
             // 

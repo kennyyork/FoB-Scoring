@@ -36,7 +36,7 @@ namespace Scoring
         private const string SCORES_FILE_PATH = "scores.txt";
         private const string ROUNDS_FILE_PATH = "rounds.txt";
 
-        private int activeRound = 0;
+        private int activeRound = -1;
         private int roundsPerTeam = 0;       
 
         private int prelimCount = 0;
@@ -46,7 +46,12 @@ namespace Scoring
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            CenterNud();
+            //center the nudPanel
+            int offsetX = scoringInput1.Left + (scoringInput1.Width / 2) - (pnlScoreIn.Width / 2);
+            int offsetY = scoringInput1.Top + scoringInput1.Height + 5;
+
+            pnlScoreIn.Left = offsetX;
+            pnlScoreIn.Top = offsetY;
 
             //load existing            
             try
@@ -60,12 +65,13 @@ namespace Scoring
 
             if (scores.Count > 0)
             {
-                activeRound = scores.Max(s => s.Round.Number) + 1;
-                nudRound.Value = activeRound;
+                activeRound = scores.Max(s => s.Round.Number); //this should really be the max round - 1 + 1 to equal the index
+                //activeRound = Math.Min(activeRound, rounds.Count - 1);
+                nudRound.Value = activeRound + 1;
             }
             else if (gameState == GameState.Preliminary)
             {
-                activeRound = 1;
+                activeRound = 0;
             }
 
             UpdateUI();            
@@ -79,7 +85,9 @@ namespace Scoring
             btnSemi.Enabled = gameState == GameState.SemiFinals;
             btnFinals.Enabled = gameState == GameState.Finals;
 
-            if (activeRound == 0 || activeRound > rounds.Count)
+            btnCurrentSched.Enabled = rounds.Count > 0;
+
+            if (activeRound < 0 || activeRound > rounds.Count)
             {
                 pnlScoreIn.Enabled = false;
             }
@@ -87,10 +95,10 @@ namespace Scoring
             {
                 pnlScoreIn.Enabled = true;
                 nudRound.Minimum = 1;
-                nudRound.Maximum = Math.Min(activeRound, rounds.Count);
+                nudRound.Maximum = Math.Min(activeRound + 1, rounds.Count);
             }
 
-            if (nudRound.Value == activeRound)
+            if (nudRound.Value == (activeRound+1) )
             {
                 btnSubmit.Text = "Submit";
             }
@@ -103,6 +111,8 @@ namespace Scoring
         private List<Team> teams = new List<Team>();
         private List<Round> rounds = new List<Round>();
         private List<Score> scores = new List<Score>();
+
+        #region File Management
 
         private void LoadFile()
         {
@@ -135,9 +145,14 @@ namespace Scoring
             {
                 //read teams 
                 sr = File.OpenText(TEAM_FILE_PATH);
-                while( (line = sr.ReadLine()) != null )
+                while ((line = sr.ReadLine()) != null)
                 {
-                    teams.Add(Team.FromString(line));                          
+                    Team newT = Team.FromString(line);
+                    if (teams.Any(t => newT.Name == t.Name || newT.Number == t.Number))
+                    {
+                        throw new InvalidOperationException(string.Format("Duplicate team on {0} or {1}", newT.Number, newT.Name));
+                    }
+                    teams.Add(newT);
                 }
                 sr.Close();
             }
@@ -145,6 +160,11 @@ namespace Scoring
             {
                 teams.Clear();
                 throw;
+            }
+
+            if( teams.Any( t => t.Notebook > 0 ) )
+            {
+                notebooksEntered = true;
             }
                 
             prelimCount = (roundsPerTeam * teams.Count) / 4;
@@ -154,13 +174,23 @@ namespace Scoring
                 sr = File.OpenText(ROUNDS_FILE_PATH);
                 while ((line = sr.ReadLine()) != null)
                 {
-                    rounds.Add(Round.FromString(teams,line));
+                    Round newR = Round.FromString(teams, line);
+                    if (rounds.Any(r => newR.Number == r.Number))
+                    {
+                        throw new InvalidOperationException(string.Format("Duplicate round on {0}", newR.Number));
+                    }
+                    rounds.Add(newR);
                 }
                 sr.Close();
             }
+            catch (InvalidOperationException)
+            {
+                rounds.Clear();
+                throw;
+            }            
             catch
-            {                
-                rounds.Clear();                
+            {
+                rounds.Clear();
             }
             
             //are the rounds valid?
@@ -182,13 +212,23 @@ namespace Scoring
                 sr = File.OpenText(SCORES_FILE_PATH);
                 while ((line = sr.ReadLine()) != null)
                 {
-                    scores.Add(Score.FromString(teams,rounds,line));
+                    Score newS = Score.FromString(teams, rounds, line);
+                    if (scores.Any(s => s.Round.Number == newS.Round.Number && s.Team.Number == newS.Team.Number))
+                    {
+                        throw new InvalidOperationException(string.Format("Duplicate score on {0} and {1}", newS.Round.Number, newS.Team.Name));
+                    }
+                    scores.Add(newS);
                 }
                 sr.Close();
             }
+            catch (InvalidOperationException)
+            {
+                scores.Clear();
+                throw;
+            }
             catch
             {
-                scores.Clear();                
+                scores.Clear();
             }
 
             //figure out what state we are in
@@ -200,7 +240,7 @@ namespace Scoring
                     gameState = GameState.Preliminary;
                 }
             }
-            else if (scores.Count < (prelimScores + WILDCARD_COUNT))
+            else if (scores.Count == (prelimScores))
             {
                 gameState = GameState.Wildcard;
             }
@@ -262,14 +302,7 @@ namespace Scoring
             sw.Close();
         }
 
-        private void CenterNud()
-        {
-            int offsetX = scoringInput1.Left + (scoringInput1.Width / 2 ) - (pnlScoreIn.Width / 2);
-            int offsetY = scoringInput1.Top + scoringInput1.Height + 5;
-
-            pnlScoreIn.Left = offsetX;
-            pnlScoreIn.Top = offsetY;
-        }
+        #endregion
 
         private List<Round> GenerateSeeding(List<Team> teams, int gamesPerTeam, bool backToBack)
         {
@@ -330,6 +363,154 @@ namespace Scoring
             return rounds;
         }
 
+        #region Score Display Handlers
+
+        private void nudRound_ValueChanged(object sender, EventArgs e)
+        {
+            //load the scores
+            if (scoringInput1.ScoresModified)
+            {
+                if ( DialogResult.Cancel == MessageBox.Show("Scores have been modified, discard?", "Discard Scores?", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning))
+                {
+                    return;
+                }
+            }
+
+            if (nudRound.Value <= rounds.Count)
+            {
+                scoringInput1.SetScores(rounds[(int)nudRound.Value - 1]);
+            }
+            UpdateUI();
+        }
+
+        private void btnSubmit_Click(object sender, EventArgs e)
+        {
+            scoringInput1.CommitScores();
+            foreach (var s in scoringInput1.CurrentScores)
+            {                
+                if (btnSubmit.Text == "Submit")
+                {
+                    scores.Add(s);
+                    AppendScore(s);
+                }
+            }
+
+            if (btnSubmit.Text == "Submit")
+            {
+                Round next1 = null, next2 = null;
+                if ((activeRound + 1) < rounds.Count)
+                {
+                    next1 = rounds[activeRound + 1];
+                }
+                if ((activeRound + 2) < rounds.Count)
+                {
+                    next2 = rounds[activeRound + 2];
+                }
+
+                wd.LastRoundDisplay(rounds[activeRound], next1, next2);
+                //wd.Show();
+                
+                ++activeRound;
+
+                //end of available rounds reached
+                if (activeRound >= rounds.Count) 
+                {
+                    AdvanceGameState();
+                }
+            }
+            else //edit forces rewrite
+            {
+                WriteScores();
+            }
+
+            UpdateUI();
+
+            if (activeRound < rounds.Count)
+            {
+                nudRound.Value = activeRound + 1;
+            }
+        }
+
+        private void AdvanceGameState()
+        {
+            switch (gameState)
+            {
+                case GameState.Preliminary:
+                    gameState = GameState.Wildcard;
+                    break;
+                case GameState.Wildcard:
+                    gameState = GameState.SemiFinals;
+                    break;
+                case GameState.SemiFinals:
+                    gameState = GameState.Finals;
+                    break;
+                default:
+                    throw new InvalidOperationException("invalid game state");
+            }
+        }
+
+        #endregion
+
+        #region Web Handlers
+
+        private void btnCurrentSched_Click(object sender, EventArgs e)
+        {
+            IEnumerable<Round> result = null;
+            string title = string.Empty;
+
+            switch (gameState)
+            {
+                case GameState.Preliminary:
+                    result = from r in rounds where r.Type == Round.Types.Preliminary select r;
+                    title = "Prelimiary Rounds";
+                    break;
+                case GameState.Wildcard:
+                    result = from r in rounds where r.Type == Round.Types.Wildcard select r;
+                    title = "Wildcard Round";
+                    if (result.Count() == 0)
+                    {
+                        MessageBox.Show("Please generate wildcard");
+                        return;
+                    }
+                    break;
+            }
+
+            if (result != null && result.Count() > 0)
+            {
+                wd.RoundDisplay(title, result);
+                wd.ShowDialog();       
+            }
+        }
+
+        private void btnTeamScore_Click(object sender, EventArgs e)
+        {            
+            wd.TeamScoreDisplay(teams[0]);
+            wd.ShowDialog();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            wd.TeamRoundDisplay(teams[0]);
+            wd.ShowDialog();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            wd.LastRoundDisplay(null, rounds[1], null);
+            wd.ShowDialog();
+        }
+
+        #endregion
+
+        private void btnNotebook_Click(object sender, EventArgs e)
+        {
+            NotebookEntry ne = new NotebookEntry(teams);
+            ne.ShowDialog();
+            notebooksEntered = true;
+        }
+
+        #region Round Generation Button Actions
+
         private void btnPrelim_Click(object sender, EventArgs e)
         {
             try
@@ -352,7 +533,7 @@ namespace Scoring
                 teams.ForEach(t => { t.Clear(); });
 
                 rounds = GenerateSeeding(teams, roundsPerTeam, false);
-                activeRound = 1;
+                activeRound = 0;
                 gameState = GameState.Preliminary;
 
                 WriteRounds();
@@ -363,130 +544,6 @@ namespace Scoring
             {
                 MessageBox.Show(ex.Message);
             }
-        }        
-
-        private void nudRound_ValueChanged(object sender, EventArgs e)
-        {
-            //load the scores
-            if (scoringInput1.ScoresModified)
-            {
-                if ( DialogResult.Cancel == MessageBox.Show("Scores have been modified, discard?", "Discard Scores?", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning))
-                {
-                    return;
-                }
-            }
-
-            scoringInput1.SetScores(rounds[(int)nudRound.Value - 1]);
-            UpdateUI();
-        }
-
-        private void btnSubmit_Click(object sender, EventArgs e)
-        {
-            scoringInput1.CommitScores();
-            foreach (var s in scoringInput1.CurrentScores)
-            {                
-                if (btnSubmit.Text == "Submit")
-                {
-                    scores.Add(s);
-                    AppendScore(s);
-                }
-            }
-
-            if (btnSubmit.Text == "Submit")
-            {
-                int round = activeRound - 1;
-
-                Round next1 = null, next2 = null;
-                if ((round + 1) < rounds.Count)
-                {
-                    next1 = rounds[round + 1];
-                }
-                if ((round + 2) < rounds.Count)
-                {
-                    next2 = rounds[round + 2];
-                }
-
-                wd.LastRoundDisplay(rounds[round], next1, next2);
-                wd.Show();
-                
-                ++activeRound;
-
-                //end of available rounds reached
-                if (activeRound > rounds.Count) 
-                {
-                    AdvanceGameState();
-                }
-            }
-            else //edit forces rewrite
-            {
-                WriteScores();
-            }
-
-            UpdateUI();
-
-            if (activeRound <= rounds.Count)
-            {
-                nudRound.Value = activeRound;
-            }
-        }
-
-        private void AdvanceGameState()
-        {
-            switch (gameState)
-            {
-                case GameState.Preliminary:
-                    gameState = GameState.Wildcard;
-                    break;
-                case GameState.Wildcard:
-                    gameState = GameState.SemiFinals;
-                    break;
-                case GameState.SemiFinals:
-                    gameState = GameState.Finals;
-                    break;
-                default:
-                    throw new InvalidOperationException("invalid game state");
-            }
-        }
-
-        private void btnCurrentSched_Click(object sender, EventArgs e)
-        {
-            wd.OverallScoresDisplay(teams, Round.Types.Preliminary);
-            wd.ShowDialog();
-
-            IEnumerable<Round> result = null;
-            string title = string.Empty;
-
-            switch (gameState)
-            {
-                case GameState.Preliminary:
-                    result = from r in rounds where r.Type == Round.Types.Preliminary select r;
-                    title = "Prelimiary Rounds";
-                    break;
-            }
-
-            if (result != null && result.Count() > 0)
-            {
-                wd.RoundDisplay(title, result);
-                wd.WriteHTML(@"html\last_round.html");                
-            }
-        }
-
-        private void btnTeamScore_Click(object sender, EventArgs e)
-        {            
-            wd.TeamScoreDisplay(teams[0]);
-            wd.ShowDialog();
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            wd.TeamRoundDisplay(teams[0]);
-            wd.ShowDialog();
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            wd.LastRoundDisplay(null, rounds[1], null);
-            wd.ShowDialog();
         }
 
         private void btnWildcard_Click(object sender, EventArgs e)
@@ -509,17 +566,19 @@ namespace Scoring
             Round r = new Round(rounds.Count + 1, Round.Types.Wildcard, wildcards[0], wildcards[1], wildcards[2], wildcards[3]);
             activeRound = rounds.Count;
             rounds.Add(r);
-            
+            AppendRound(r);
+
             UpdateUI();
-            
-            nudRound.Value = activeRound;
+
+            nudRound.Value = activeRound + 1;
         }
 
-        private void btnNotebook_Click(object sender, EventArgs e)
+        private void btnSemi_Click(object sender, EventArgs e)
         {
-            NotebookEntry ne = new NotebookEntry(teams);
-            ne.ShowDialog();
+
         }
+
+        #endregion
     }
 
     public static class Extensions
