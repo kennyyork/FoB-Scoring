@@ -37,7 +37,7 @@ namespace Scoring
         private const string ROUNDS_FILE_PATH = "rounds.txt";
 
         private int activeRound = -1;
-        private int roundsPerTeam = 0;       
+        private int roundsPerTeam = 0;               
 
         private int prelimCount = 0;
         private const int WILDCARD_COUNT = 1;
@@ -80,9 +80,11 @@ namespace Scoring
         bool notebooksEntered = false;
         private void UpdateUI()
         {
+            int prelimCount = roundsPerTeam * teams.Count / 4;
+
             btnPrelim.Enabled = gameState == GameState.None || gameState == GameState.Preliminary;
-            btnWildcard.Enabled = gameState == GameState.Wildcard;
-            btnSemi.Enabled = gameState == GameState.SemiFinals;
+            btnWildcard.Enabled = gameState == GameState.Wildcard && (rounds.Count == prelimCount);
+            btnSemi.Enabled = gameState == GameState.SemiFinals && (rounds.Count == prelimCount + 1);
             btnFinals.Enabled = gameState == GameState.Finals;
 
             btnCurrentSched.Enabled = rounds.Count > 0;
@@ -147,12 +149,15 @@ namespace Scoring
                 sr = File.OpenText(TEAM_FILE_PATH);
                 while ((line = sr.ReadLine()) != null)
                 {
-                    Team newT = Team.FromString(line);
-                    if (teams.Any(t => newT.Name == t.Name || newT.Number == t.Number))
+                    if (line != string.Empty)
                     {
-                        throw new InvalidOperationException(string.Format("Duplicate team on {0} or {1}", newT.Number, newT.Name));
+                        Team newT = Team.FromString(line);
+                        if (teams.Any(t => newT.Name == t.Name || newT.Number == t.Number))
+                        {
+                            throw new InvalidOperationException(string.Format("Duplicate team on {0} or {1}", newT.Number, newT.Name));
+                        }
+                        teams.Add(newT);
                     }
-                    teams.Add(newT);
                 }
                 sr.Close();
             }
@@ -174,12 +179,15 @@ namespace Scoring
                 sr = File.OpenText(ROUNDS_FILE_PATH);
                 while ((line = sr.ReadLine()) != null)
                 {
-                    Round newR = Round.FromString(teams, line);
-                    if (rounds.Any(r => newR.Number == r.Number))
+                    if (line != string.Empty)
                     {
-                        throw new InvalidOperationException(string.Format("Duplicate round on {0}", newR.Number));
+                        Round newR = Round.FromString(teams, line);
+                        if (rounds.Any(r => newR.Number == r.Number))
+                        {
+                            throw new InvalidOperationException(string.Format("Duplicate round on {0}", newR.Number));
+                        }
+                        rounds.Add(newR);
                     }
-                    rounds.Add(newR);
                 }
                 sr.Close();
             }
@@ -188,7 +196,7 @@ namespace Scoring
                 rounds.Clear();
                 throw;
             }            
-            catch
+            catch(Exception ex)
             {
                 rounds.Clear();
             }
@@ -212,12 +220,15 @@ namespace Scoring
                 sr = File.OpenText(SCORES_FILE_PATH);
                 while ((line = sr.ReadLine()) != null)
                 {
-                    Score newS = Score.FromString(teams, rounds, line);
-                    if (scores.Any(s => s.Round.Number == newS.Round.Number && s.Team.Number == newS.Team.Number))
+                    if (line != string.Empty)
                     {
-                        throw new InvalidOperationException(string.Format("Duplicate score on {0} and {1}", newS.Round.Number, newS.Team.Name));
+                        Score newS = Score.FromString(teams, rounds, line);
+                        if (scores.Any(s => s.Round.Number == newS.Round.Number && s.Team.Number == newS.Team.Number))
+                        {
+                            throw new InvalidOperationException(string.Format("Duplicate score on {0} and {1}", newS.Round.Number, newS.Team.Name));
+                        }
+                        scores.Add(newS);
                     }
-                    scores.Add(newS);
                 }
                 sr.Close();
             }
@@ -304,22 +315,24 @@ namespace Scoring
 
         #endregion
 
-        private List<Round> GenerateSeeding(List<Team> teams, int gamesPerTeam, bool backToBack)
+        private List<Round> GenerateSeeding(List<Team> teams, int gamesPerTeam, Round.Types type, bool backToBack)
         {
             //generate a random list of all teams
             //select 4 teams from that list wher not in last round
               //if 4 not available, re-add all teams and select where 1) not in current set and 2) not in last round
                 //if 4 not available, select any needed
 
+            int currentRound = rounds.Count + 1;
+
             StringBuilder debug = new StringBuilder();
 
-            List<Round> rounds = new List<Round>();
+            List<Round> newRounds = new List<Round>();
             int required = (teams.Count * gamesPerTeam) / 4;
 
             List<Team> availTeams = teams.Shuffle();
-            while (rounds.Count < required)
-            {                                   
-                List<Team> set = availTeams.TakeAndRemove(4, t => t.LastRound != rounds.Count);
+            while (newRounds.Count < required)
+            {
+                List<Team> set = availTeams.TakeAndRemove(4, t => t.LastRound != (currentRound-1));
                 debug.AppendFormat("first set {0}  ",set.Count);
                 foreach (var s in set) { debug.AppendFormat(" {0} ", s); }
                 debug.AppendLine();
@@ -328,7 +341,7 @@ namespace Scoring
                 {
                     debug.AppendFormat("failed to pull 4, only got {0}\n", set.Count);
                     availTeams = teams.Shuffle();
-                    set.AddRange(availTeams.TakeAndRemove(4 - set.Count, t => (t.LastRound != rounds.Count) && !set.Contains(t)));
+                    set.AddRange(availTeams.TakeAndRemove(4 - set.Count, t => (t.LastRound != (currentRound - 1)) && !set.Contains(t)));
 
                     debug.AppendFormat("second set {0}  ",set.Count);
                     foreach (var s in set) { debug.AppendFormat(" {0} ", s); }
@@ -356,11 +369,11 @@ namespace Scoring
                     }
                 }
 
-                Round r = new Round(rounds.Count + 1, Round.Types.Preliminary, set[0], set[1], set[2], set[3]);
-                rounds.Add(r);                
+                Round r = new Round(currentRound++, type, set[0], set[1], set[2], set[3]);
+                newRounds.Add(r);                
             }
 
-            return rounds;
+            return newRounds;
         }
 
         #region Score Display Handlers
@@ -456,7 +469,7 @@ namespace Scoring
         private void btnCurrentSched_Click(object sender, EventArgs e)
         {
             IEnumerable<Round> result = null;
-            string title = string.Empty;
+            string title = "Unknown";            
 
             switch (gameState)
             {
@@ -466,19 +479,29 @@ namespace Scoring
                     break;
                 case GameState.Wildcard:
                     result = from r in rounds where r.Type == Round.Types.Wildcard select r;
-                    title = "Wildcard Round";
-                    if (result.Count() == 0)
-                    {
-                        MessageBox.Show("Please generate wildcard");
-                        return;
-                    }
+                    title = "Wildcard Round";                    
+                    break;      
+                case GameState.SemiFinals:
+                    result = from r in rounds where r.Type == Round.Types.Semifinals select r;
+                    title = "Semifinal Rounds";
                     break;
+                case GameState.Finals:
+                    result = from r in rounds where r.Type == Round.Types.Finals select r;
+                    title = "Finals Rounds";
+                    break;      
             }
 
-            if (result != null && result.Count() > 0)
+            if (result != null)
             {
-                wd.RoundDisplay(title, result);
-                wd.ShowDialog();       
+                if (result.Count() > 0)
+                {
+                    wd.RoundDisplay(title, result);
+                    wd.ShowDialog();
+                }
+                else
+                {
+                    MessageBox.Show(string.Format("Please generate {0}",title));                     
+                }
             }
         }
 
@@ -532,7 +555,7 @@ namespace Scoring
                 scores.Clear();
                 teams.ForEach(t => { t.Clear(); });
 
-                rounds = GenerateSeeding(teams, roundsPerTeam, false);
+                rounds = GenerateSeeding(teams, roundsPerTeam, Round.Types.Preliminary, false);
                 activeRound = 0;
                 gameState = GameState.Preliminary;
 
@@ -575,7 +598,20 @@ namespace Scoring
 
         private void btnSemi_Click(object sender, EventArgs e)
         {
+            var scores = from t in teams orderby t.TotalScore(Round.Types.Preliminary) descending select t;
+            var semi = scores.Take(7);
 
+            var wildcard = rounds.Single(r => r.Type == Round.Types.Wildcard).Teams.OrderByDescending(t => t.TotalScore(Round.Types.Wildcard)).First();
+
+            var semiTeams = semi.ToList();
+            semiTeams.Add(wildcard);
+
+            rounds.AddRange(GenerateSeeding(semiTeams, 6, Round.Types.Semifinals, false));
+            WriteRounds();
+
+            UpdateUI();
+
+            nudRound.Value = activeRound + 1;
         }
 
         #endregion
