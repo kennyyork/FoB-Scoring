@@ -85,6 +85,7 @@
             this.btnFinals.TabIndex = 9;
             this.btnFinals.Text = "Generate Finals";
             this.btnFinals.UseVisualStyleBackColor = true;
+            this.btnFinals.Click += new System.EventHandler(this.btnFinals_Click);
             // 
             // groupBox1
             // 

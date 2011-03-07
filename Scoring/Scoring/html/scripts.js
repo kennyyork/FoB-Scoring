@@ -9,7 +9,7 @@
         return decodeURIComponent(results[1].replace(/\+/g, ' '));
 }
 
-var pages = ['current_schedule.html','overall_scores.html','last_round.html'];
+var pages = ['current_schedule.html','overall_scores_0.html','last_round.html'];
 
 function onLoad() {
     var timeout = getParameterByName('refresh');

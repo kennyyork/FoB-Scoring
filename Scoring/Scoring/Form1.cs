@@ -19,7 +19,8 @@ namespace Scoring
             Preliminary,
             Wildcard,
             SemiFinals,
-            Finals
+            Finals,
+            Complete
         }
 
         private GameState gameState = GameState.None;
@@ -40,9 +41,9 @@ namespace Scoring
         private int roundsPerTeam = 0;               
 
         private int prelimCount = 0;
-        private const int WILDCARD_COUNT = 1;
-        private const int SEMIFINAL_COUNT = 8;
-        private const int FINAL_COUNT = 8;        
+        private const int WILDCARD_ROUNDS = 1;
+        private const int SEMIFINAL_ROUNDS = 12;
+        private const int FINAL_ROUNDS = 4;        
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -85,7 +86,7 @@ namespace Scoring
             btnPrelim.Enabled = gameState == GameState.None || gameState == GameState.Preliminary;
             btnWildcard.Enabled = gameState == GameState.Wildcard && (rounds.Count == prelimCount);
             btnSemi.Enabled = gameState == GameState.SemiFinals && (rounds.Count == prelimCount + 1);
-            btnFinals.Enabled = gameState == GameState.Finals;
+            btnFinals.Enabled = gameState == GameState.Finals && (rounds.Count < (prelimCount + WILDCARD_ROUNDS + SEMIFINAL_ROUNDS));
 
             btnCurrentSched.Enabled = rounds.Count > 0;
 
@@ -95,9 +96,9 @@ namespace Scoring
             }
             else
             {
-                pnlScoreIn.Enabled = true;
-                nudRound.Minimum = 1;
+                pnlScoreIn.Enabled = true;                
                 nudRound.Maximum = Math.Min(activeRound + 1, rounds.Count);
+                nudRound.Minimum = 1;
             }
 
             if (nudRound.Value == (activeRound+1) )
@@ -196,7 +197,7 @@ namespace Scoring
                 rounds.Clear();
                 throw;
             }            
-            catch(Exception ex)
+            catch
             {
                 rounds.Clear();
             }
@@ -255,18 +256,22 @@ namespace Scoring
             {
                 gameState = GameState.Wildcard;
             }
-            else if (scores.Count < (prelimScores + WILDCARD_COUNT + SEMIFINAL_COUNT))
-            {
-                gameState = GameState.SemiFinals;
-            }
-            else if (scores.Count < (prelimScores + WILDCARD_COUNT + SEMIFINAL_COUNT + FINAL_COUNT))
+            else if (scores.Count >= (prelimScores + (WILDCARD_ROUNDS * 4) + (SEMIFINAL_ROUNDS * 4)))
             {
                 gameState = GameState.Finals;
             }
+            else if (scores.Count < (prelimScores + (WILDCARD_ROUNDS * 4) + (SEMIFINAL_ROUNDS * 4)))
+            {
+                gameState = GameState.SemiFinals;
+            }
             else
             {
-                throw new InvalidOperationException("Could not determine game state");
+                gameState = GameState.Complete;
             }
+            //else
+            //{
+            //    throw new InvalidOperationException("Could not determine game state");
+            //}
         }
         
         private void WriteTeams()
@@ -314,6 +319,13 @@ namespace Scoring
         }
 
         #endregion
+
+        private class TeamWrapper
+        {
+            public Team Team;
+            public int LastRound;
+            public int Games;
+        }
 
         private List<Round> GenerateSeeding(List<Team> teams, int gamesPerTeam, Round.Types type, bool backToBack)
         {
@@ -410,17 +422,7 @@ namespace Scoring
 
             if (btnSubmit.Text == "Submit")
             {
-                Round next1 = null, next2 = null;
-                if ((activeRound + 1) < rounds.Count)
-                {
-                    next1 = rounds[activeRound + 1];
-                }
-                if ((activeRound + 2) < rounds.Count)
-                {
-                    next2 = rounds[activeRound + 2];
-                }
-
-                wd.LastRoundDisplay(rounds[activeRound], next1, next2);
+                UpdateWeb();
                 //wd.Show();
                 
                 ++activeRound;
@@ -444,6 +446,25 @@ namespace Scoring
             }
         }
 
+        private void UpdateWeb()
+        {
+            Round next1 = null, next2 = null;
+            if ((activeRound + 1) < rounds.Count)
+            {
+                next1 = rounds[activeRound + 1];
+            }
+            if ((activeRound + 2) < rounds.Count)
+            {
+                next2 = rounds[activeRound + 2];
+            }
+
+            wd.LastRoundDisplay(rounds[activeRound], next1, next2);
+            wd.WriteHTML(@"html\last_round.html");
+            wd.RoundDisplay(gameState.ToString(), rounds.Skip(activeRound).Take(8));
+            wd.WriteHTML(@"html\current_schedule.html");
+            wd.OverallScoresDisplay(teams, CovertState(gameState), true);
+        }
+
         private void AdvanceGameState()
         {
             switch (gameState)
@@ -456,6 +477,9 @@ namespace Scoring
                     break;
                 case GameState.SemiFinals:
                     gameState = GameState.Finals;
+                    break;
+                case GameState.Finals:
+                    gameState = GameState.Complete;
                     break;
                 default:
                     throw new InvalidOperationException("invalid game state");
@@ -527,6 +551,14 @@ namespace Scoring
 
         private void btnNotebook_Click(object sender, EventArgs e)
         {
+            if (gameState != GameState.Preliminary)
+            {
+                if (DialogResult.No == MessageBox.Show("Seeding rounds are finished, are you sure you want to change notebook scores?", "Change Scores?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning))
+                {
+                    return;
+                }
+            }
+
             NotebookEntry ne = new NotebookEntry(teams);
             ne.ShowDialog();
             notebooksEntered = true;
@@ -562,6 +594,7 @@ namespace Scoring
                 WriteRounds();
 
                 UpdateUI();
+                UpdateWeb();
             }
             catch (Exception ex)
             {
@@ -598,8 +631,10 @@ namespace Scoring
 
         private void btnSemi_Click(object sender, EventArgs e)
         {
-            var scores = from t in teams orderby t.TotalScore(Round.Types.Preliminary) descending select t;
-            var semi = scores.Take(7);
+            //var scores = from t in teams orderby t.TotalScore(Round.Types.Preliminary) descending select t;
+            //var semi = scores.Take(7);
+
+            var semi = teams.OrderByDescending(t => t.TotalScore(Round.Types.Preliminary)).Take(7);
 
             var wildcard = rounds.Single(r => r.Type == Round.Types.Wildcard).Teams.OrderByDescending(t => t.TotalScore(Round.Types.Wildcard)).First();
 
@@ -614,7 +649,44 @@ namespace Scoring
             nudRound.Value = activeRound + 1;
         }
 
+        private void btnFinals_Click(object sender, EventArgs e)
+        {
+            var finals = teams.OrderByDescending(t => t.TotalScore(Round.Types.Semifinals)).Take(4).ToList();
+
+            Round r = new Round(activeRound + 1, Round.Types.Finals, finals[0], finals[1], finals[2], finals[3]);
+            for (int i = 0; i < 4; ++i)
+            {
+                rounds.Add(r);
+                AppendRound(r);
+
+                r = new Round(activeRound + 2 + i, Round.Types.Finals, r.Green, r.Blue, r.Yellow, r.Red);
+            }
+
+            UpdateUI();
+
+            nudRound.Value = activeRound + 1;
+        }
+
         #endregion
+
+        private Round.Types CovertState(GameState state)
+        {
+            switch (state)
+            {
+                case GameState.Complete:
+                case GameState.Finals:
+                    return Round.Types.Finals;
+                case GameState.Preliminary:
+                case GameState.None:
+                    return Round.Types.Preliminary;
+                case GameState.Wildcard:
+                    return Round.Types.Wildcard;
+                case GameState.SemiFinals:
+                    return Round.Types.Semifinals;
+                default:
+                    throw new ArgumentException();
+            }
+        }
     }
 
     public static class Extensions

@@ -27,19 +27,20 @@ namespace Scoring
         {                        
             InitializeComponent();
             webBrowser.ScriptErrorsSuppressed = true;
+            velocity = new VelocityEngine();
+            var p = new Commons.Collections.ExtendedProperties();           
+
 #if DEBUG
             string temp = Application.ExecutablePath;
             string[] split = Application.ExecutablePath.Split('\\');
             string pathRoot = string.Join("\\", split, 0, split.Length - 3);
             cssFile = string.Format(@"file:///{0}\html\best.css", pathRoot);
-            scriptFile = string.Format(@"file:///{0}\html\scripts.js", pathRoot);
-#else 
+            scriptFile = string.Format(@"file:///{0}\html\scripts.js", pathRoot);\
+            p.AddProperty("file.resource.loader.path", new System.Collections.ArrayList(new string[] { pathRoot }));
+#else
             cssFile = "best.css";
             scriptFile = "scripts.js";            
 #endif
-            velocity = new VelocityEngine();
-            var p = new Commons.Collections.ExtendedProperties();            
-            p.AddProperty("file.resource.loader.path", new System.Collections.ArrayList(new string[] { pathRoot }));            
             velocity.Init(p);
             baseContext = new VelocityContext();
             baseContext.Put("script", scriptFile);
@@ -125,7 +126,7 @@ namespace Scoring
 
             if (next2 != null)
             {
-                list.Add(new { Number = next1.Number, Red = next1.Red.Name, Green = next1.Green.Name, Blue = next1.Blue.Name, Yellow = next1.Yellow.Name });
+                list.Add(new { Number = next2.Number, Red = next2.Red.Name, Green = next2.Green.Name, Blue = next2.Blue.Name, Yellow = next2.Yellow.Name });
             }
             else
             {
@@ -139,12 +140,14 @@ namespace Scoring
             webBrowser.DocumentText = sw.GetStringBuilder().ToString();
         }
 
-        public void OverallScoresDisplay(IEnumerable<Team> teams, Round.Types type)
+        public void OverallScoresDisplay(IEnumerable<Team> teams, Round.Types type, bool split)
         {
             Template template = velocity.GetTemplate(@"templates\overall_scores.vm");
             
+            //filter teams by round
+            var teamSet = teams.Where(t => t.Rounds.Any(r => r.Type == type));
 
-            var scores = (from t in teams orderby t.TotalScore(type) descending select new TempScore { Name = t.Name, Score = t.TotalScore(type) }).ToList();
+            var scores = (from t in teamSet orderby t.TotalScore(type) descending select new TempScore { Name = t.Name, Score = t.TotalScore(type) }).ToList();
             
             int place = 1;
             int count = 1;
@@ -166,16 +169,27 @@ namespace Scoring
                 ++count;
             }
 
-            int total = scores.Count;
-            for (int i = 0; i < total; i += 16)
+            if (split)
+            {
+                int total = scores.Count;
+                for (int i = 0; i < total; i += 16)
+                {
+                    VelocityContext c = new VelocityContext(baseContext);
+                    var section = scores.Skip(i).Take(16).ToList();
+                    c.Put("teams", section);
+                    StringWriter sw = new StringWriter();
+                    template.Merge(c, sw);
+
+                    File.WriteAllText(string.Format(@"html\overall_scores_{0}.html", i / 16), sw.ToString());
+                }
+            }
+            else
             {
                 VelocityContext c = new VelocityContext(baseContext);
-                var section = scores.Skip(i).Take(16).ToList();                
-                c.Put("teams", section);
+                c.Put("teams", scores);
                 StringWriter sw = new StringWriter();
                 template.Merge(c, sw);
-
-                File.WriteAllText(string.Format(@"html\overall_scores_{0}.html", i % 16), sw.ToString());
+                webBrowser.DocumentText = sw.ToString();
             }
         }
 
