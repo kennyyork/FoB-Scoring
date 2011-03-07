@@ -470,11 +470,9 @@ namespace Scoring
                 next2 = rounds[activeRound + 2];
             }
 
-            wd.LastRoundDisplay(rounds[activeRound], next1, next2);
-            wd.WriteHTML(@"html\last_round.html");
-            wd.RoundDisplay(gameState.ToString(), rounds.Skip(activeRound).Take(8));
-            wd.WriteHTML(@"html\current_schedule.html");
-            wd.OverallScoresDisplay(teams, CovertState(gameState), true);
+            HtmlGenerator.LastRoundDisplay(rounds[activeRound], next1, next2);            
+            HtmlGenerator.RoundDisplay(HtmlGenerator.PageId.RoundPartial, gameState.ToString(), rounds.Skip(activeRound).Take(8));            
+            HtmlGenerator.OverallScoresDisplay(teams, CovertState(gameState), true);
         }
 
         private void AdvanceGameState()
@@ -531,8 +529,9 @@ namespace Scoring
             {
                 if (result.Count() > 0)
                 {
-                    wd.RoundDisplay(title, result);
-                    wd.ShowDialog();
+                    HtmlGenerator.RoundDisplay(HtmlGenerator.PageId.RoundFull, gameState.ToString(), result);
+                    wd.DisplayPage(HtmlGenerator.PageId.RoundFull);
+                    wd.Show();
                 }
                 else
                 {
@@ -543,20 +542,20 @@ namespace Scoring
 
         private void btnTeamScore_Click(object sender, EventArgs e)
         {            
-            wd.TeamScoreDisplay(teams[0]);
-            wd.ShowDialog();
+            //wd.TeamScoreDisplay(teams[0]);
+            //wd.ShowDialog();
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            wd.TeamRoundDisplay(teams[0]);
-            wd.ShowDialog();
+            //wd.TeamRoundDisplay(teams[0]);
+            //wd.ShowDialog();
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            wd.LastRoundDisplay(null, rounds[1], null);
-            wd.ShowDialog();
+            //wd.LastRoundDisplay(null, rounds[1], null);
+            //wd.ShowDialog();
         }
 
         #endregion
@@ -604,6 +603,7 @@ namespace Scoring
                 gameState = GameState.Preliminary;
 
                 WriteRounds();
+                HtmlGenerator.RoundDisplay(HtmlGenerator.PageId.RoundFull, gameState.ToString(), rounds);
 
                 UpdateUI();
                 UpdateWeb();
@@ -636,6 +636,8 @@ namespace Scoring
             rounds.Add(r);
             AppendRound(r);
 
+            HtmlGenerator.RoundDisplay(HtmlGenerator.PageId.RoundFull, gameState.ToString(), new List<Round> { r });
+
             UpdateUI();
 
             nudRound.Value = activeRound + 1;
@@ -653,8 +655,11 @@ namespace Scoring
             var semiTeams = semi.ToList();
             semiTeams.Add(wildcard);
 
-            rounds.AddRange(GenerateSeeding(semiTeams, 6, Round.Types.Semifinals, false));
+            var newRounds = GenerateSeeding(semiTeams, 6, Round.Types.Semifinals, false);
+            rounds.AddRange(newRounds);
             WriteRounds();
+
+            HtmlGenerator.RoundDisplay(HtmlGenerator.PageId.RoundFull, gameState.ToString(), newRounds);
 
             UpdateUI();
 
@@ -673,6 +678,9 @@ namespace Scoring
 
                 r = new Round(activeRound + 2 + i, Round.Types.Finals, r.Green, r.Blue, r.Yellow, r.Red);
             }
+
+            var finalSched = from r1 in rounds where r1.Type == Round.Types.Finals orderby r1.Number select r1;
+            HtmlGenerator.RoundDisplay(HtmlGenerator.PageId.RoundFull, gameState.ToString(), finalSched);
 
             UpdateUI();
 
