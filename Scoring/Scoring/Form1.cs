@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using System.Security.Cryptography;
+using System.Diagnostics;
 
 namespace Scoring
 {
@@ -47,6 +48,8 @@ namespace Scoring
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            StartServer();
+
             //center the nudPanel
             int offsetX = scoringInput1.Left + (scoringInput1.Width / 2) - (pnlScoreIn.Width / 2);
             int offsetY = scoringInput1.Top + scoringInput1.Height + 5;
@@ -76,6 +79,15 @@ namespace Scoring
             }
 
             UpdateUI();            
+        }
+
+        private void StartServer()
+        {
+            var p = Process.GetProcessesByName("mongoose-2.11");
+            if (p.Length == 0)
+            {                
+                Process proc = Process.Start(@"html\mongoose-2.11.exe");                
+            }
         }
 
         bool notebooksEntered = false;

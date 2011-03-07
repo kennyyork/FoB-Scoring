@@ -35,7 +35,7 @@ namespace Scoring
             string[] split = Application.ExecutablePath.Split('\\');
             string pathRoot = string.Join("\\", split, 0, split.Length - 3);
             cssFile = string.Format(@"file:///{0}\html\best.css", pathRoot);
-            scriptFile = string.Format(@"file:///{0}\html\scripts.js", pathRoot);\
+            scriptFile = string.Format(@"file:///{0}\html\scripts.js", pathRoot);
             p.AddProperty("file.resource.loader.path", new System.Collections.ArrayList(new string[] { pathRoot }));
 #else
             cssFile = "best.css";
