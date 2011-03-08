@@ -1,112 +1,87 @@
-﻿table
-{
-	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
-	font-size: 12px;
-	margin: 0px;
-	width: 100%;	
-	border-collapse: collapse;
-	border: 1px solid;
-	text-align: center	
+﻿body {
+    background: none repeat scroll 0 0 lightBlue;
 }
-
-thead
-{	
-	display: table-header-group;
+table {
+    border: 1px solid;
+    border-collapse: collapse;
+    font-family: "Lucida Sans Unicode","Lucida Grande",Sans-Serif;
+    font-size: 12px;
+    margin: 0;
+    text-align: center;
+    width: 100%;
 }
-
-th
-{
-	padding: 15px 10px 10px 10px;
-	font-weight: normal;
-	font-size: 14px;	
-	/*color: #039;*/
-	border-bottom: 2px solid;
+thead {
+    display: table-header-group;
 }
-
-tr
-{
-	page-break-inside: avoid;
+th {
+    border-bottom: 2px solid;
+    font-size: 14px;
+    font-weight: normal;
+    padding: 15px 10px 10px;
 }
-
-td
-{
-	padding: 10px;
-	/*color: #669;*/
-	border-top: 1px solid;
-	border-right: 1px solid;
+tr {
+    page-break-inside: avoid;
 }
-
-.scoreDisplay table
-{
-	width: 95%;
-	margin: auto;
+td {
+    border-right: 1px solid;
+    border-top: 1px solid;
+    padding: 10px;
 }
-
-.nextRound table
-{
+.scoreDisplay {
+    margin-bottom: 3%;
+}
+.scoreDisplay table {
+    font-size: 50%;
+    margin: auto;
+    width: 95%;
+}
+.nextRound table {
     float: left;
-    width: 20%;
+    width: 35%;
 }
-
-#round_1
-{
-	position:absolute;
-	left: 10%;
+#round_1 {
+    left: 6%;
+    position: absolute;
 }
-
-#round_2
-{
-	position:absolute;
-	right:10%;
+#round_2 {
+    position: absolute;
+    right: 6%;
 }
-
-.overallDisplayInner
-{
-	float: left;
-	width: 48%;
-	margin-left: 1%;
-	margin-right: 1%;	
+.overallDisplayInner {
+    float: left;
+    margin-left: 1%;
+    margin-right: 1%;
+    width: 48%;
 }
-
-.overallDisplayInner table,tr,td,th
-{
-	font-size: 30px;
+.overallDisplayInner table, tr, td, th {
+    font-size: 20px;
 }
-
-.overallPlace
-{
-	width: 1%;
+.overallPlace {
+    width: 1%;
 }
-
-.overallScore
-{
-	width: 4%;
+.overallScore {
+    width: 4%;
 }
-
-@media print
-{
-	
+.redCell {
+    background: none repeat scroll 0 0 Red;
 }
-
-@media screen
-{
-	.redCell
-	{
-		background:Red;
-	}
-
-	.blueCell
-	{
-		background:blue;
-	}
-
-	.greenCell
-	{
-		background:green;
-	}
-
-	.yellowCell
-	{
-		background:yellow;
-	}
+.blueCell {
+    background: none repeat scroll 0 0 blue;
+}
+.greenCell {
+    background: none repeat scroll 0 0 green;
+}
+.yellowCell {
+    background: none repeat scroll 0 0 yellow;
+}
+.mainHeader {
+    left: 5%;
+    margin: 0;
+    width: 8%;
+}
+.mainHeader p {
+    background: none repeat scroll 0 0 yellow;
+    font-size: 20px;
+    left: 5%;
+    text-align: center;
 }
