@@ -201,11 +201,24 @@ namespace Scoring
             }
         }
 
-        public void TeamScoreDisplay(Team team)
+        public static void TeamScoreDisplay(List<Team> teams)
         {
-            Template template = velocity.GetTemplate(@"templates\team_scores_display.vm");
+            Directory.CreateDirectory(@"html\scores");
 
-            //{ PageId.TeamScore, "teams_{0}.html" },
+            Template template = velocity.GetTemplate(@"templates\team_scores_display.vm");
+            VelocityContext c = new VelocityContext(baseContext);
+
+            foreach (var t in teams)
+            {
+                c.Put("title", t.Name);
+                
+                var scoreGroups = from s in t.Scores group s by s.Round.Type into score select new { Type = score.Key, Scores = score };
+                c.Put("scores",scoreGroups);
+                
+                StringWriter sw = new StringWriter();
+                template.Merge(c, sw);
+                File.WriteAllText(@"html\scores\" + string.Format(fileMap[PageId.TeamScores], t.Number), sw.ToString());
+            }            
         }
     }
 }

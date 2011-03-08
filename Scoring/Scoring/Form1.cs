@@ -452,6 +452,7 @@ namespace Scoring
         private void btnSubmit_Click(object sender, EventArgs e)
         {
             scoringInput1.CommitScores();
+            List<Team> curTeams = new List<Team>();
             foreach (var s in scoringInput1.CurrentScores)
             {                
                 if (btnSubmit.Text == "Submit")
@@ -459,7 +460,11 @@ namespace Scoring
                     scores.Add(s);
                     AppendScore(s);
                 }
+
+                curTeams.Add(s.Team);
             }
+
+            HtmlGenerator.TeamScoreDisplay(curTeams);
 
             if (btnSubmit.Text == "Submit")
             {
