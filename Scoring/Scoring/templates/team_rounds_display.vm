@@ -1,24 +1,25 @@
-﻿<html>
-</head>
-	<script type="text/javascript" src="$script"></script>
-	<link rel="stylesheet" type="text/css" href="$css"/>		
+﻿##not html
+<html>
+<head>
+	<script type="text/javascript" src="/$script"></script>
+	<link rel="stylesheet" type="text/css" href="/$css"/>		
 </head>
 <body onload="onLoad()">
-<div class="mainHeader" id="teamRoundsHeader"><p>$team.Name</p></div>
-#foreach($round in $rounds)
+<div class="mainHeader" id="teamRoundsHeader"><p>$name</p></div>
+#foreach($section in $roundGroups)
 #beforeall
-<div class="roundDisplay">
-	<table id="teamRoundsTable">
-		<thead>
-			<tr><th>Round</th><th>Color</th></tr>
-		</thead>
-		<tbody>
-#afterall		
-		</tbody>
-	</table>
-</div>	
+<div class="scoreDisplay">
+  <table id="teamScoresTable">
+	<tr><th>Round Number</th><th>Color</th></tr>
+#afterall
+  </table>
+</div>
+#each
+<tr><th colspan="100">$section.Type</th></tr>
+#foreach($round in $section.Rounds)
 #each
 			<tr><td>$round.Number</td><td>$round.Color</td></tr>
+#end
 #end
 </body>
 </html>

@@ -25,55 +25,67 @@ namespace Scoring
 
         public IList<Team> Teams
         {
-            get { return teams; }
+            get { return teamList; }
         }
         
         public Team Red 
         {
-            get { return teams[RED]; }
-            private set { teams[RED] = value; }
+            get { return teamList[RED]; }
+            private set { teamList[RED] = value; }
         }
 
         public Team Green
         {
-            get { return teams[GREEN]; }
-            private set { teams[GREEN] = value; }
+            get { return teamList[GREEN]; }
+            private set { teamList[GREEN] = value; }
         }
 
         public Team Blue
         {
-            get { return teams[BLUE]; }
-            private set { teams[BLUE] = value; }
+            get { return teamList[BLUE]; }
+            private set { teamList[BLUE] = value; }
         }
 
         public Team Yellow
         {
-            get { return teams[YELLOW]; }
-            private set { teams[YELLOW] = value; }
+            get { return teamList[YELLOW]; }
+            private set { teamList[YELLOW] = value; }
         }
 
-        private List<Team> teams;
+        private List<Team> teamList;
 
-        public Round(int number, Types type, Team red, Team green, Team blue, Team yellow)
+        //public Round(int number, Types type, Team red, Team green, Team blue, Team yellow)
+        //{
+        //    teamList = new List<Team>();
+
+        //    Number = number;
+        //    Type = type;
+        //    teamList.Add(red);
+        //    teamList.Add(green);
+        //    teamList.Add(blue);
+        //    teamList.Add(yellow);
+
+        //    red.AddRound(this);
+        //    green.AddRound(this);
+        //    blue.AddRound(this);
+        //    yellow.AddRound(this);            
+        //}
+
+        public Round(int number, Types type, IEnumerable<Team> teams)
         {
-            teams = new List<Team>();
-
+            teamList = teams.ToList();            
             Number = number;
             Type = type;
-            teams.Add(red);
-            teams.Add(green);
-            teams.Add(blue);
-            teams.Add(yellow);
 
-            red.AddRound(this);
-            green.AddRound(this);
-            blue.AddRound(this);
-            yellow.AddRound(this);            
+            foreach (var t in teamList)
+            {
+                t.AddRound(this);
+            }            
         }
 
         public string TeamColor(Team team)
         {
-            int i = teams.IndexOf(team);
+            int i = teamList.IndexOf(team);
             switch(i)
             {
                 case RED:
@@ -91,7 +103,7 @@ namespace Scoring
 
         public Score GetScore(int color)
         {
-            return teams[color].GetScore(this);
+            return teamList[color].GetScore(this);
         }
 
         public override string ToString()
@@ -107,16 +119,18 @@ namespace Scoring
                 int number = int.Parse(split[0]);
                 Types type = (Types)int.Parse(split[1]);
 
-                int id = int.Parse(split[2]);
-                Team t1 = teams.Single(t => t.Number == id);
-                id = int.Parse(split[3]);
-                Team t2 = teams.Single(t => t.Number == id);
-                id = int.Parse(split[4]);
-                Team t3 = teams.Single(t => t.Number == id);
-                id = int.Parse(split[5]);
-                Team t4 = teams.Single(t => t.Number == id);
+                List<Team> roundT = new List<Team>();
 
-                Round r = new Round(number, type, t1, t2, t3, t4);
+                int id = int.Parse(split[2]);
+                roundT.Add(teams.Single(t => t.Number == id));
+                id = int.Parse(split[3]);
+                roundT.Add(teams.Single(t => t.Number == id));
+                id = int.Parse(split[4]);
+                roundT.Add(teams.Single(t => t.Number == id));
+                id = int.Parse(split[5]);
+                roundT.Add(teams.Single(t => t.Number == id));
+
+                Round r = new Round(number, type, roundT);
                 return r;
             }
             catch

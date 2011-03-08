@@ -1,8 +1,8 @@
 #set( $thead = "<tr><th>Round</th><th>Markers</th><th>Good Cars</th><th>Bad Cars</th><th>Good Logs</th><th>Bad Logs</th><th>Good Coal</th><th>Bad Coal</th><th>Multiplier</th><th>Score</th><th>Total Score</th></tr>" )
 <html>
 </head>
-	<script type="text/javascript" src="$script"></script>
-	<link rel="stylesheet" type="text/css" href="$css"/>		
+	<script type="text/javascript" src="/$script"></script>
+	<link rel="stylesheet" type="text/css" href="/$css"/>		
 </head>
 <body onload="onLoad()">
 <div class="mainHeader"><p id="lastRoundHeader">Round#if($!current.Number) #$current.Number#end</p></div>

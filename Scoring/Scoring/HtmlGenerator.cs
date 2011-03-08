@@ -40,6 +40,8 @@ namespace Scoring
             LastRound,
             OverallScores,
             OverallScoresSplit,
+            TeamScores,
+            TeamRounds,
         }
 
         private static Dictionary<PageId, string> fileMap = new Dictionary<PageId, string>
@@ -49,6 +51,8 @@ namespace Scoring
             { PageId.LastRound, "last_round.html" },
             { PageId.OverallScores, "overall_scores.html" },
             { PageId.OverallScoresSplit, "overall_scores_{0}.html" },
+            { PageId.TeamScores, "team_{0}.html" },
+            { PageId.TeamRounds, "team_{0}.html" },
         };
 
         public static string GetPageId(PageId id) { return fileMap[id]; }
@@ -176,8 +180,32 @@ namespace Scoring
                 c.Put("teams", scores);
                 StringWriter sw = new StringWriter();
                 template.Merge(c, sw);
-                File.WriteAllText(fileMap[PageId.OverallScores], sw.ToString());
+                File.WriteAllText("html\\" + fileMap[PageId.OverallScores], sw.ToString());
             }
+        }
+
+        public static void TeamRoundsDisplay(List<Team> teams)
+        {
+            Directory.CreateDirectory(@"html\schedules");
+
+            Template template = velocity.GetTemplate(@"templates\team_rounds_display.vm");
+            VelocityContext c = new VelocityContext(baseContext);
+            foreach (var t in teams)
+            {
+                c.Put("name", t.Name);
+                var roundGroup = from r in t.Rounds group r by r.Type into s select new { Type = s.Key, Rounds = from r1 in s select new { r1.Number, Color = r1.TeamColor(t) } };
+                c.Put("roundGroups", roundGroup);
+                StringWriter sw = new StringWriter();
+                template.Merge(c, sw);
+                File.WriteAllText( @"html\schedules\" + string.Format(fileMap[PageId.TeamRounds], t.Number),sw.ToString());
+            }
+        }
+
+        public void TeamScoreDisplay(Team team)
+        {
+            Template template = velocity.GetTemplate(@"templates\team_scores_display.vm");
+
+            //{ PageId.TeamScore, "teams_{0}.html" },
         }
     }
 }

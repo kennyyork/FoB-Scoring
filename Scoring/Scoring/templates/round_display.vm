@@ -1,7 +1,7 @@
 <html>
-</head>
-	<script type="text/javascript" src="$script"></script>
-	<link rel="stylesheet" type="text/css" href="$css"/>		
+<head>
+	<script type="text/javascript" src="/$script"></script>
+	<link rel="stylesheet" type="text/css" href="/$css"/>		
 </head>
 <body onload="onLoad()">
 <div class="mainHeader" id="roundDisplayHeader"><p>$title</p></div>

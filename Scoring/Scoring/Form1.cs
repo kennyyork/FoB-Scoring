@@ -332,31 +332,50 @@ namespace Scoring
 
         #endregion
 
+        [DebuggerDisplay("{Team.Name} = {Games},{LastRound}")]
         private class TeamWrapper
         {
             public Team Team;
             public int LastRound;
             public int Games;
+
+            public TeamWrapper(Team t)
+            {
+                Team = t;
+                LastRound = -1;
+                Games = 0;
+            }
+            
+            public static List<TeamWrapper> Wrap(IEnumerable<Team> teams)
+            {
+                List<TeamWrapper> wrapper = new List<TeamWrapper>();
+                foreach (var t in teams)
+                {
+                    wrapper.Add(new TeamWrapper(t));
+                }
+                return wrapper;
+            }
         }
 
-        private List<Round> GenerateSeeding(List<Team> teams, int gamesPerTeam, Round.Types type, bool backToBack)
+        private List<Round> GenerateSeeding(List<Team> origTeams, int gamesPerTeam, Round.Types type, bool backToBack)
         {
+            StringBuilder debug = new StringBuilder();
+            
             //generate a random list of all teams
             //select 4 teams from that list wher not in last round
               //if 4 not available, re-add all teams and select where 1) not in current set and 2) not in last round
                 //if 4 not available, select any needed
 
             int currentRound = rounds.Count + 1;
-
-            StringBuilder debug = new StringBuilder();
-
-            List<Round> newRounds = new List<Round>();
+            List<TeamWrapper> teams = TeamWrapper.Wrap(origTeams);
+            
+            List<Round> output = new List<Round>();
             int required = (teams.Count * gamesPerTeam) / 4;
 
-            List<Team> availTeams = teams.Shuffle();
-            while (newRounds.Count < required)
+            List<TeamWrapper> availTeams = teams.Shuffle();
+            while (output.Count < required)
             {
-                List<Team> set = availTeams.TakeAndRemove(4, t => t.LastRound != (currentRound-1));
+                List<TeamWrapper> set = availTeams.TakeAndRemove(4, t => t.LastRound != (currentRound - 1) && t.Games < gamesPerTeam);
                 debug.AppendFormat("first set {0}  ",set.Count);
                 foreach (var s in set) { debug.AppendFormat(" {0} ", s); }
                 debug.AppendLine();
@@ -365,7 +384,7 @@ namespace Scoring
                 {
                     debug.AppendFormat("failed to pull 4, only got {0}\n", set.Count);
                     availTeams = teams.Shuffle();
-                    set.AddRange(availTeams.TakeAndRemove(4 - set.Count, t => (t.LastRound != (currentRound - 1)) && !set.Contains(t)));
+                    set.AddRange(availTeams.TakeAndRemove(4 - set.Count, t => (t.LastRound != (currentRound - 1) && t.Games < gamesPerTeam) && !set.Contains(t)));
 
                     debug.AppendFormat("second set {0}  ",set.Count);
                     foreach (var s in set) { debug.AppendFormat(" {0} ", s); }
@@ -373,31 +392,41 @@ namespace Scoring
 
                     if (set.Count < 4)
                     {
-                        debug.AppendFormat("failed to pull 4, only got {0}\n", set.Count);
-
-                        if (!backToBack)
+                        //is this our last round?
+                        if (output.Count == (required - 1))
                         {
-                            throw new InvalidOperationException("unable to generate a seeding with the provided inputs");
+                            //TODO: fix our last round?
+                            break;
                         }
-
-                        set.AddRange(availTeams.TakeAndRemove(4 - set.Count, t => !set.Contains(t)));
-
-                        debug.AppendFormat("final set {0}  ", set.Count);
-                        foreach (var s in set) { debug.AppendFormat(" {0} ", s); }
-                        debug.AppendLine();
-
-                        if (set.Count < 4)
+                        else
                         {
-                            throw new InvalidOperationException("unable to generate a seeding with the provided inputs");
+                            debug.AppendFormat("failed to pull 4, only got {0}\n", set.Count);
+
+                            if (!backToBack)
+                            {
+                                throw new InvalidOperationException("unable to generate a seeding with the provided inputs");
+                            }
+
+                            set.AddRange(availTeams.TakeAndRemove(4 - set.Count, t => !set.Contains(t)));
+
+                            debug.AppendFormat("final set {0}  ", set.Count);
+                            foreach (var s in set) { debug.AppendFormat(" {0} ", s); }
+                            debug.AppendLine();
+
+                            if (set.Count < 4)
+                            {
+                                throw new InvalidOperationException("unable to generate a seeding with the provided inputs");
+                            }
                         }
                     }
                 }
 
-                Round r = new Round(currentRound++, type, set[0], set[1], set[2], set[3]);
-                newRounds.Add(r);                
+                set.ForEach(t => { ++t.Games; t.LastRound = currentRound; });
+                Round r = new Round(currentRound++, type, from s in set select s.Team);
+                output.Add(r);                
             }
 
-            return newRounds;
+            return output;
         }
 
         #region Score Display Handlers
@@ -604,6 +633,7 @@ namespace Scoring
 
                 WriteRounds();
                 HtmlGenerator.RoundDisplay(HtmlGenerator.PageId.RoundFull, gameState.ToString(), rounds);
+                HtmlGenerator.TeamRoundsDisplay(teams);
 
                 UpdateUI();
                 UpdateWeb();
@@ -631,12 +661,13 @@ namespace Scoring
             var topNotebooks = from t in teams where !topSeven.Contains(t) orderby t.Notebook descending select t;
             var wildcards = topNotebooks.Take(4).ToList();
 
-            Round r = new Round(rounds.Count + 1, Round.Types.Wildcard, wildcards[0], wildcards[1], wildcards[2], wildcards[3]);
+            Round r = new Round(rounds.Count + 1, Round.Types.Wildcard, wildcards);
             activeRound = rounds.Count;
             rounds.Add(r);
             AppendRound(r);
 
             HtmlGenerator.RoundDisplay(HtmlGenerator.PageId.RoundFull, gameState.ToString(), new List<Round> { r });
+            HtmlGenerator.TeamRoundsDisplay(teams);
 
             UpdateUI();
 
@@ -660,6 +691,7 @@ namespace Scoring
             WriteRounds();
 
             HtmlGenerator.RoundDisplay(HtmlGenerator.PageId.RoundFull, gameState.ToString(), newRounds);
+            HtmlGenerator.TeamRoundsDisplay(teams);
 
             UpdateUI();
 
@@ -670,17 +702,18 @@ namespace Scoring
         {
             var finals = teams.OrderByDescending(t => t.TotalScore(Round.Types.Semifinals)).Take(4).ToList();
 
-            Round r = new Round(activeRound + 1, Round.Types.Finals, finals[0], finals[1], finals[2], finals[3]);
+            Round r = new Round(activeRound + 1, Round.Types.Finals, finals);
             for (int i = 0; i < 4; ++i)
             {
                 rounds.Add(r);
                 AppendRound(r);
 
-                r = new Round(activeRound + 2 + i, Round.Types.Finals, r.Green, r.Blue, r.Yellow, r.Red);
+                r = new Round(activeRound + 2 + i, Round.Types.Finals, finals);
             }
 
             var finalSched = from r1 in rounds where r1.Type == Round.Types.Finals orderby r1.Number select r1;
             HtmlGenerator.RoundDisplay(HtmlGenerator.PageId.RoundFull, gameState.ToString(), finalSched);
+            HtmlGenerator.TeamRoundsDisplay(teams);
 
             UpdateUI();
 
@@ -735,19 +768,6 @@ namespace Scoring
                 temp[k] = temp[n];
                 temp[n] = value;
             }
-
-            //Random rng = new Random();
-            //int n = temp.Count;
-            //while (n > 1)
-            //{
-            //    int k = rng.Next(n);
-            //    debug.AppendFormat("rng {0}\n", k);
-
-            //    --n;
-            //    T value = temp[k];
-            //    temp[k] = temp[n];
-            //    temp[n] = value;
-            //}
 
             return temp;
         }

@@ -9,8 +9,7 @@ namespace Scoring
     public class Team : System.ComponentModel.INotifyPropertyChanged
     {
         public string Name { get; private set; }
-        public int Number { get; private set; }
-        public int LastRound { get; private set; }
+        public int Number { get; private set; }        
         private double notebook;
 
         public double Notebook 
@@ -33,8 +32,7 @@ namespace Scoring
         {
             Name = name;
             Number = number;
-            Notebook = 0;
-            LastRound = -1;
+            Notebook = 0;            
 
             scores = new List<Score>();
             rounds = new List<Round>();
@@ -48,7 +46,6 @@ namespace Scoring
             }
 
             scores.Add(score);
-            LastRound = score.Round.Number;
         }
 
         public void AddRound(Round round)
@@ -58,7 +55,6 @@ namespace Scoring
                 throw new InvalidOperationException("Round already exists in collection");
             }
 
-            LastRound = round.Number;
             rounds.Add(round);
         }
 
@@ -97,7 +93,6 @@ namespace Scoring
 
         public void Clear()
         {
-            LastRound = -1;
             rounds.Clear();
             scores.Clear();
         }
