@@ -1,0 +1,23 @@
+<html>
+<head>
+	<script type="text/javascript" src="/$script"></script>
+	<link rel="stylesheet" type="text/css" href="/$css"/>		
+</head>
+<body onload="onLoad()">
+<div class="mainHeader" id="overallScoresHeader">Overall Scores</div>
+#foreach($section in $scores)
+#beforeall
+<div class="scoreDisplay">
+	<table id="scoreDisplayTable">
+#afterall
+	</table>
+</div>
+#each
+		<tr><th colspan="100">$section.Key</th><tr>	
+#foreach($team in $section.Value)
+#each		
+			<tr><td class="overallPlace">$team.Place</td><td>$team.Name</td><td class="overallScore">$team.Score</td></tr>
+#end
+#end
+</body>
+</html>

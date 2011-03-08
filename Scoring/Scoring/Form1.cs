@@ -506,7 +506,7 @@ namespace Scoring
 
             HtmlGenerator.LastRoundDisplay(rounds[activeRound], next1, next2);            
             HtmlGenerator.RoundDisplay(HtmlGenerator.PageId.RoundPartial, gameState.ToString(), rounds.Skip(activeRound).Take(8));            
-            HtmlGenerator.OverallScoresDisplay(teams, CovertState(gameState), true);
+            HtmlGenerator.OverallScoresDisplay(teams, CovertState(gameState));
         }
 
         private void AdvanceGameState()
@@ -590,6 +590,7 @@ namespace Scoring
         {
             //wd.LastRoundDisplay(null, rounds[1], null);
             //wd.ShowDialog();
+            HtmlGenerator.OverallScoresDisplayPrint(teams);
         }
 
         #endregion

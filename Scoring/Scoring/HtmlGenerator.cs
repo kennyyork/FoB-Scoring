@@ -49,7 +49,7 @@ namespace Scoring
             { PageId.RoundFull, "round_display_full.html" },
             { PageId.RoundPartial, "round_display.html" },
             { PageId.LastRound, "last_round.html" },
-            { PageId.OverallScores, "overall_scores.html" },
+            { PageId.OverallScores, "overall_scores_full.html" },
             { PageId.OverallScoresSplit, "overall_scores_{0}.html" },
             { PageId.TeamScores, "team_{0}.html" },
             { PageId.TeamRounds, "team_{0}.html" },
@@ -122,27 +122,23 @@ namespace Scoring
             File.WriteAllText("html\\" + fileName, sw.ToString());
         }
 
+        [System.Diagnostics.DebuggerDisplay("{Name} = {Place} with {Score}")]
         private class TempScore
         {
             public string Name { get; set; }
             public int Place { get; set; }
-            public double Score { get; set; }
+            public int Score { get; set; }
         }
 
-        public static void OverallScoresDisplay(IEnumerable<Team> teams, Round.Types type, bool split)
+        private static IEnumerable<TempScore> PlaceTeams(IEnumerable<TempScore> scores)
         {
-            Template template = velocity.GetTemplate(@"templates\overall_scores.vm");
-
-            //filter teams by round
-            var teamSet = teams.Where(t => t.Rounds.Any(r => r.Type == type));
-
-            var scores = (from t in teamSet orderby t.TotalScore(type) descending select new TempScore { Name = t.Name, Score = t.TotalScore(type) }).ToList();
-
             int place = 1;
             int count = 1;
             double last = double.MaxValue;
 
-            foreach (var t in scores)
+            var s = scores.ToList();
+
+            foreach (var t in s)
             {
                 if (t.Score == last)
                 {
@@ -158,30 +154,63 @@ namespace Scoring
                 ++count;
             }
 
-            if (split)
-            {
-                string path = "html\\" + fileMap[PageId.OverallScoresSplit];
+            return s;
+        }
 
-                int total = scores.Count;
-                for (int i = 0; i < total; i += 16)
-                {
-                    VelocityContext c = new VelocityContext(baseContext);
-                    var section = scores.Skip(i).Take(16).ToList();
-                    c.Put("teams", section);
-                    StringWriter sw = new StringWriter();
-                    template.Merge(c, sw);
+        public static void OverallScoresDisplay(IEnumerable<Team> teams, Round.Types type)
+        {
+            Template template = velocity.GetTemplate(@"templates\overall_scores.vm");
 
-                    File.WriteAllText(string.Format(path, i / 16), sw.ToString());
-                }
-            }
-            else
+            //filter teams by round
+            var teamSet = teams.Where(t => t.Rounds.Any(r => r.Type == type));
+
+            var scores = (from t in teamSet orderby t.TotalScore(type) descending select new TempScore { Name = t.Name, Score = (int)t.TotalScore(type) }).ToList();
+
+            PlaceTeams(scores);
+
+            string path = "html\\" + fileMap[PageId.OverallScoresSplit];
+
+            int total = scores.Count;
+            for (int i = 0; i < total; i += 16)
             {
                 VelocityContext c = new VelocityContext(baseContext);
-                c.Put("teams", scores);
+                var section = scores.Skip(i).Take(16).ToList();
+                c.Put("teams", section);
                 StringWriter sw = new StringWriter();
                 template.Merge(c, sw);
-                File.WriteAllText("html\\" + fileMap[PageId.OverallScores], sw.ToString());
+
+                File.WriteAllText(string.Format(path, i / 16), sw.ToString());
             }
+            //}
+            //else
+            //{
+            //    VelocityContext c = new VelocityContext(baseContext);
+            //    c.Put("teams", scores);
+            //    StringWriter sw = new StringWriter();
+            //    template.Merge(c, sw);
+            //    File.WriteAllText("html\\" + fileMap[PageId.OverallScores], sw.ToString());
+            //}
+        }
+
+        public static void OverallScoresDisplayPrint(List<Team> teams)
+        {
+            List<Round.Types> rType = new List<Round.Types> { Round.Types.Preliminary, Round.Types.Wildcard, Round.Types.Semifinals, Round.Types.Finals };
+            
+            //1 group teams by what round they competed                       
+            Dictionary<Round.Types, List<TempScore>> groups = new Dictionary<Round.Types, List<TempScore>>();
+            foreach (var type in rType)
+            {
+                var scores = teams.Where(t => t.Rounds.Any(r => r.Type == type)).OrderByDescending(t => t.TotalScore(type)).Select(t => new TempScore { Score = (int)t.TotalScore(type), Name = t.Name, Place = 0 });
+                scores = PlaceTeams(scores);
+                groups.Add(type, scores.ToList());
+            }
+
+            Template template = velocity.GetTemplate(@"templates\overall_scores_print.vm");
+            VelocityContext c = new VelocityContext(baseContext);
+            c.Put("scores", groups);
+            StringWriter sw = new StringWriter();
+            template.Merge(c, sw);
+            File.WriteAllText("html\\" + fileMap[PageId.OverallScores], sw.ToString());
         }
 
         public static void TeamRoundsDisplay(List<Team> teams)
@@ -190,14 +219,15 @@ namespace Scoring
 
             Template template = velocity.GetTemplate(@"templates\team_rounds_display.vm");
             VelocityContext c = new VelocityContext(baseContext);
+            
             foreach (var t in teams)
             {
                 c.Put("name", t.Name);
-                var roundGroup = from r in t.Rounds group r by r.Type into s select new { Type = s.Key, Rounds = from r1 in s select new { r1.Number, Color = r1.TeamColor(t) } };
+                var roundGroup = from r in t.Rounds group r by r.Type into s select new { Type = s.Key, Rounds = from r1 in s select new { r1.Number, Color = r1.TeamColor(t) } };                
                 c.Put("roundGroups", roundGroup);
                 StringWriter sw = new StringWriter();
                 template.Merge(c, sw);
-                File.WriteAllText( @"html\schedules\" + string.Format(fileMap[PageId.TeamRounds], t.Number),sw.ToString());
+                File.WriteAllText(@"html\schedules\" + string.Format(fileMap[PageId.TeamRounds], t.Number), sw.ToString());
             }
         }
 

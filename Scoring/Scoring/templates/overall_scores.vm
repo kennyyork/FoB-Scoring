@@ -5,7 +5,6 @@
 </head>
 <body onload="onLoad()">
 <div class="mainHeader"><p id="overallScoresHeader">Current Scores</p></div>
-
 #foreach( $team in $teams )
 #beforeall
 <div class="overallDisplay">
