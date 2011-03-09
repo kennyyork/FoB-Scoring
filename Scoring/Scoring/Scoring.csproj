@@ -136,6 +136,12 @@
     <None Include="html\mongoose.conf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="templates\ref_master_sheet.vm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="templates\ref_field_sheet.vm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="templates\overall_scores_print.vm" />
     <None Include="templates\overall_scores.vm">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -24,12 +24,10 @@ namespace Scoring
             
         }
 
-        public void DisplayPage(HtmlGenerator.PageId pageId)
-        {
-            string page = HtmlGenerator.GetPageId(pageId);
-            string url = @"http://localhost/" + page;
-            webBrowser.Navigate(url);
-            txtUrl.Text = page;
+        public void DisplayPage(string url)
+        {            
+            webBrowser.Navigate(@"http://localhost/" + url);
+            txtUrl.Text = url;
         }
 
         private void WaitForComplete()
@@ -59,7 +57,7 @@ namespace Scoring
                     }
                     else
                     {
-                        webBrowser.Print();      
+                        webBrowser.Print();                              
                     }
                     key.SetValue("footer", old_footer);
                     key.SetValue("header", old_header);

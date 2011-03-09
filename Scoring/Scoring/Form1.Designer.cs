@@ -38,13 +38,22 @@
             this.pnlScoreIn = new System.Windows.Forms.Panel();
             this.btnSubmit = new System.Windows.Forms.Button();
             this.btnCurrentSched = new System.Windows.Forms.Button();
-            this.btnTeamScore = new System.Windows.Forms.Button();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.btnPrintScore = new System.Windows.Forms.Button();
+            this.gbWeb = new System.Windows.Forms.GroupBox();
+            this.btnWebAll = new System.Windows.Forms.Button();
+            this.btnUpdateWeb = new System.Windows.Forms.Button();
+            this.gbPrint = new System.Windows.Forms.GroupBox();
+            this.btnPrintBlank = new System.Windows.Forms.Button();
+            this.btnPrintFinal = new System.Windows.Forms.Button();
+            this.btnPrintSchedule = new System.Windows.Forms.Button();
+            this.btnPrintAll = new System.Windows.Forms.Button();
             this.scoringInput1 = new Scoring.ScoringInput();
+            this.btnPrintRefSheet = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudRound)).BeginInit();
             this.pnlScoreIn.SuspendLayout();
+            this.gbWeb.SuspendLayout();
+            this.gbPrint.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnPrelim
@@ -148,35 +157,98 @@
             this.btnCurrentSched.UseVisualStyleBackColor = true;
             this.btnCurrentSched.Click += new System.EventHandler(this.btnCurrentSched_Click);
             // 
-            // btnTeamScore
+            // btnPrintScore
             // 
-            this.btnTeamScore.Location = new System.Drawing.Point(674, 277);
-            this.btnTeamScore.Name = "btnTeamScore";
-            this.btnTeamScore.Size = new System.Drawing.Size(103, 34);
-            this.btnTeamScore.TabIndex = 16;
-            this.btnTeamScore.Text = "View Team Score";
-            this.btnTeamScore.UseVisualStyleBackColor = true;
-            this.btnTeamScore.Click += new System.EventHandler(this.btnTeamScore_Click);
+            this.btnPrintScore.Location = new System.Drawing.Point(674, 277);
+            this.btnPrintScore.Name = "btnPrintScore";
+            this.btnPrintScore.Size = new System.Drawing.Size(103, 34);
+            this.btnPrintScore.TabIndex = 16;
+            this.btnPrintScore.Text = "Print Score Sheets";
+            this.btnPrintScore.UseVisualStyleBackColor = true;
+            this.btnPrintScore.Click += new System.EventHandler(this.btnPrintScore_Click);
             // 
-            // button1
+            // gbWeb
             // 
-            this.button1.Location = new System.Drawing.Point(674, 317);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(103, 34);
-            this.button1.TabIndex = 17;
-            this.button1.Text = "View Team Schedule";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.gbWeb.Controls.Add(this.btnWebAll);
+            this.gbWeb.Controls.Add(this.btnUpdateWeb);
+            this.gbWeb.Location = new System.Drawing.Point(133, 367);
+            this.gbWeb.Name = "gbWeb";
+            this.gbWeb.Size = new System.Drawing.Size(115, 136);
+            this.gbWeb.TabIndex = 17;
+            this.gbWeb.TabStop = false;
+            this.gbWeb.Text = "Webpage";
             // 
-            // button2
+            // btnWebAll
             // 
-            this.button2.Location = new System.Drawing.Point(674, 357);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(103, 34);
-            this.button2.TabIndex = 18;
-            this.button2.Text = "Update Round Display";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.btnWebAll.Location = new System.Drawing.Point(6, 60);
+            this.btnWebAll.Name = "btnWebAll";
+            this.btnWebAll.Size = new System.Drawing.Size(103, 35);
+            this.btnWebAll.TabIndex = 1;
+            this.btnWebAll.Text = "Update All";
+            this.btnWebAll.UseVisualStyleBackColor = true;
+            // 
+            // btnUpdateWeb
+            // 
+            this.btnUpdateWeb.Location = new System.Drawing.Point(6, 19);
+            this.btnUpdateWeb.Name = "btnUpdateWeb";
+            this.btnUpdateWeb.Size = new System.Drawing.Size(103, 35);
+            this.btnUpdateWeb.TabIndex = 0;
+            this.btnUpdateWeb.Text = "Update Current";
+            this.btnUpdateWeb.UseVisualStyleBackColor = true;
+            // 
+            // gbPrint
+            // 
+            this.gbPrint.Controls.Add(this.btnPrintRefSheet);
+            this.gbPrint.Controls.Add(this.btnPrintBlank);
+            this.gbPrint.Controls.Add(this.btnPrintFinal);
+            this.gbPrint.Controls.Add(this.btnPrintSchedule);
+            this.gbPrint.Controls.Add(this.btnPrintAll);
+            this.gbPrint.Location = new System.Drawing.Point(12, 205);
+            this.gbPrint.Name = "gbPrint";
+            this.gbPrint.Size = new System.Drawing.Size(115, 298);
+            this.gbPrint.TabIndex = 18;
+            this.gbPrint.TabStop = false;
+            this.gbPrint.Text = "Printing";
+            // 
+            // btnPrintBlank
+            // 
+            this.btnPrintBlank.Location = new System.Drawing.Point(6, 222);
+            this.btnPrintBlank.Name = "btnPrintBlank";
+            this.btnPrintBlank.Size = new System.Drawing.Size(103, 35);
+            this.btnPrintBlank.TabIndex = 4;
+            this.btnPrintBlank.Text = "Blank Master";
+            this.btnPrintBlank.UseVisualStyleBackColor = true;
+            this.btnPrintBlank.Click += new System.EventHandler(this.btnPrintBlank_Click);
+            // 
+            // btnPrintFinal
+            // 
+            this.btnPrintFinal.Location = new System.Drawing.Point(6, 181);
+            this.btnPrintFinal.Name = "btnPrintFinal";
+            this.btnPrintFinal.Size = new System.Drawing.Size(103, 35);
+            this.btnPrintFinal.TabIndex = 3;
+            this.btnPrintFinal.Text = "Final Scores";
+            this.btnPrintFinal.UseVisualStyleBackColor = true;
+            this.btnPrintFinal.Click += new System.EventHandler(this.btnPrintFinal_Click);
+            // 
+            // btnPrintSchedule
+            // 
+            this.btnPrintSchedule.Location = new System.Drawing.Point(6, 60);
+            this.btnPrintSchedule.Name = "btnPrintSchedule";
+            this.btnPrintSchedule.Size = new System.Drawing.Size(103, 35);
+            this.btnPrintSchedule.TabIndex = 2;
+            this.btnPrintSchedule.Text = "Schedule";
+            this.btnPrintSchedule.UseVisualStyleBackColor = true;
+            this.btnPrintSchedule.Click += new System.EventHandler(this.btnPrintSchedule_Click);
+            // 
+            // btnPrintAll
+            // 
+            this.btnPrintAll.Location = new System.Drawing.Point(6, 19);
+            this.btnPrintAll.Name = "btnPrintAll";
+            this.btnPrintAll.Size = new System.Drawing.Size(103, 35);
+            this.btnPrintAll.TabIndex = 1;
+            this.btnPrintAll.Text = "All for Current";
+            this.btnPrintAll.UseVisualStyleBackColor = true;
+            this.btnPrintAll.Click += new System.EventHandler(this.btnPrintAll_Click);
             // 
             // scoringInput1
             // 
@@ -185,14 +257,23 @@
             this.scoringInput1.Size = new System.Drawing.Size(650, 180);
             this.scoringInput1.TabIndex = 5;
             // 
+            // btnPrintRefSheet
+            // 
+            this.btnPrintRefSheet.Location = new System.Drawing.Point(6, 101);
+            this.btnPrintRefSheet.Name = "btnPrintRefSheet";
+            this.btnPrintRefSheet.Size = new System.Drawing.Size(103, 35);
+            this.btnPrintRefSheet.TabIndex = 5;
+            this.btnPrintRefSheet.Text = "Ref Sheets";
+            this.btnPrintRefSheet.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(787, 553);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
-            this.Controls.Add(this.btnTeamScore);
+            this.Controls.Add(this.gbPrint);
+            this.Controls.Add(this.gbWeb);
+            this.Controls.Add(this.btnPrintScore);
             this.Controls.Add(this.btnCurrentSched);
             this.Controls.Add(this.pnlScoreIn);
             this.Controls.Add(this.btnNotebook);
@@ -206,6 +287,8 @@
             this.groupBox1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.nudRound)).EndInit();
             this.pnlScoreIn.ResumeLayout(false);
+            this.gbWeb.ResumeLayout(false);
+            this.gbPrint.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -223,9 +306,16 @@
         private System.Windows.Forms.Panel pnlScoreIn;
         private System.Windows.Forms.Button btnSubmit;
         private System.Windows.Forms.Button btnCurrentSched;
-        private System.Windows.Forms.Button btnTeamScore;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button btnPrintScore;
+        private System.Windows.Forms.GroupBox gbWeb;
+        private System.Windows.Forms.Button btnUpdateWeb;
+        private System.Windows.Forms.GroupBox gbPrint;
+        private System.Windows.Forms.Button btnPrintSchedule;
+        private System.Windows.Forms.Button btnPrintAll;
+        private System.Windows.Forms.Button btnPrintFinal;
+        private System.Windows.Forms.Button btnPrintBlank;
+        private System.Windows.Forms.Button btnWebAll;
+        private System.Windows.Forms.Button btnPrintRefSheet;
     }
 }
 

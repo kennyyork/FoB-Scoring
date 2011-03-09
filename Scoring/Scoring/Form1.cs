@@ -467,8 +467,7 @@ namespace Scoring
             HtmlGenerator.TeamScoreDisplay(curTeams);
 
             if (btnSubmit.Text == "Submit")
-            {
-                UpdateWeb();
+            {                
                 //wd.Show();
                 
                 ++activeRound;
@@ -485,6 +484,7 @@ namespace Scoring
             }
 
             UpdateUI();
+            UpdateWeb();
 
             if (activeRound < rounds.Count)
             {
@@ -506,7 +506,7 @@ namespace Scoring
 
             HtmlGenerator.LastRoundDisplay(rounds[activeRound], next1, next2);            
             HtmlGenerator.RoundDisplay(HtmlGenerator.PageId.RoundPartial, gameState.ToString(), rounds.Skip(activeRound).Take(8));            
-            HtmlGenerator.OverallScoresDisplay(teams, CovertState(gameState));
+            HtmlGenerator.OverallScoresDisplay(teams, ConvertState(gameState));
         }
 
         private void AdvanceGameState()
@@ -564,7 +564,7 @@ namespace Scoring
                 if (result.Count() > 0)
                 {
                     HtmlGenerator.RoundDisplay(HtmlGenerator.PageId.RoundFull, gameState.ToString(), result);
-                    wd.DisplayPage(HtmlGenerator.PageId.RoundFull);
+                    wd.DisplayPage(HtmlGenerator.GetPageId(HtmlGenerator.PageId.RoundFull));
                     wd.Show();
                 }
                 else
@@ -728,7 +728,7 @@ namespace Scoring
 
         #endregion
 
-        private Round.Types CovertState(GameState state)
+        private Round.Types ConvertState(GameState state)
         {
             switch (state)
             {
@@ -745,6 +745,61 @@ namespace Scoring
                 default:
                     throw new ArgumentException();
             }
+        }
+
+        private void btnPrintScore_Click(object sender, EventArgs e)
+        {
+            if (DialogResult.No == MessageBox.Show("for sure print?", "?", MessageBoxButtons.YesNo))
+            {
+                return;
+            }
+
+            var set = from r in rounds where r.Type == ConvertState(gameState) select r;
+            //HtmlGenerator.RefereeFieldSheets(set);
+            HtmlGenerator.RefereeMasterSheets(set);
+
+            //wd.Show();
+            //string path = HtmlGenerator.GetPageId(HtmlGenerator.PageId.ScoringReferee);            
+            
+            //wd.DisplayPage(string.Format(path, "red"));
+            //wd.Print(true);
+
+            //wd.DisplayPage(string.Format(path, "green"));
+            //wd.Print(true);
+
+            //wd.DisplayPage(string.Format(path, "blue"));
+            //wd.Print(true);
+
+            //wd.DisplayPage(string.Format(path, "yellow"));
+            //wd.Print(true);
+        }
+
+        private void btnPrintAll_Click(object sender, EventArgs e)
+        {
+            //1 - print master schedule
+            //2 - print field sheets for each field
+            //3 - print score cards
+
+            wd.Show();
+            //wd.DisplayPage(HtmlGenerator.GetPageId(HtmlGenerator.PageId.RoundFull));
+            //wd.Print(true);
+
+            //string path = HtmlGenerator.GetPageId(HtmlGenerator.PageId.ScoringReferee);            
+
+            //wd.DisplayPage(string.Format(path, "red"));
+            //wd.Print(true);
+
+            //wd.DisplayPage(string.Format(path, "green"));
+            //wd.Print(true);
+
+            //wd.DisplayPage(string.Format(path, "blue"));
+            //wd.Print(true);
+
+            //wd.DisplayPage(string.Format(path, "yellow"));
+            //wd.Print(true);
+
+            wd.DisplayPage(HtmlGenerator.GetPageId(HtmlGenerator.PageId.ScoringMaster));
+            wd.Print(true);
         }
     }
 

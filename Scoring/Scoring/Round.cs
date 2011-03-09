@@ -86,7 +86,12 @@ namespace Scoring
         public string TeamColor(Team team)
         {
             int i = teamList.IndexOf(team);
-            switch(i)
+            return TeamColor(i);
+        }
+
+        public static string TeamColor(int color)
+        {            
+            switch(color)
             {
                 case RED:
                     return "Red";

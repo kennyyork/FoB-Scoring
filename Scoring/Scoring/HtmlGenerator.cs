@@ -42,6 +42,8 @@ namespace Scoring
             OverallScoresSplit,
             TeamScores,
             TeamRounds,
+            ScoringReferee,
+            ScoringMaster,
         }
 
         private static Dictionary<PageId, string> fileMap = new Dictionary<PageId, string>
@@ -53,6 +55,8 @@ namespace Scoring
             { PageId.OverallScoresSplit, "overall_scores_{0}.html" },
             { PageId.TeamScores, "team_{0}.html" },
             { PageId.TeamRounds, "team_{0}.html" },
+            { PageId.ScoringReferee, "ref_field_{0}.html" },
+            { PageId.ScoringMaster, "ref_master.html" },
         };
 
         public static string GetPageId(PageId id) { return fileMap[id]; }
@@ -249,6 +253,38 @@ namespace Scoring
                 template.Merge(c, sw);
                 File.WriteAllText(@"html\scores\" + string.Format(fileMap[PageId.TeamScores], t.Number), sw.ToString());
             }            
+        }
+
+        public static void RefereeFieldSheets(IEnumerable<Round> rounds)
+        {
+            Template t = velocity.GetTemplate(@"templates\ref_master_sheet.vm");
+            VelocityContext c = new VelocityContext(baseContext);
+
+            int[] colors = new int[] { 0, 1, 2, 3 };
+            
+            foreach (var color in colors)
+            {
+                c.Put("color", Round.TeamColor(color));
+                var teams = from r in rounds select new { Number = r.Number, TeamName = r.Teams[color].Name };
+                c.Put("rounds", teams);
+
+                StringWriter sw = new StringWriter();
+                t.Merge(c, sw);
+                File.WriteAllText("html\\" + string.Format(fileMap[PageId.ScoringReferee], Round.TeamColor(color).ToLower()), sw.ToString());
+            }
+        }
+
+        public static void RefereeMasterSheets(IEnumerable<Round> rounds)
+        {
+            Template template = velocity.GetTemplate(@"templates\ref_master_sheet.vm");
+            VelocityContext c = new VelocityContext(baseContext);
+
+            var rnds = from r in rounds orderby r.Number select new { Number = r.Number, Teams = from t in r.Teams select new { Name = t.Name, Color = r.TeamColor(t) } };
+            c.Put("rounds", rnds);
+
+            StringWriter sw = new StringWriter();
+            template.Merge(c, sw);
+            File.WriteAllText("html\\" + fileMap[PageId.ScoringMaster], sw.ToString());
         }
     }
 }

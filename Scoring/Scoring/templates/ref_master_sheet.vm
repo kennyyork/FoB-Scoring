@@ -1,0 +1,27 @@
+﻿#set( $thead = "<tr><th>Color</th><th>Team</th><th>Markers</th><th>Good Cars</th><th>Bad Cars</th><th>Good Logs</th><th>Bad Logs</th><th>Good Coal</th><th>Bad Coal</th><th>Multiplier</th></tr>" )
+<html>
+<head>
+	<script type="text/javascript" src="/$script"></script>
+	<link rel="stylesheet" type="text/css" href="/$css"/>		
+</head>
+<body onload="onLoad()">
+#foreach($round in $rounds)
+#before
+#if( $velocityCount % 4 == 1 )
+<div class="scoreSheet">
+#end
+	<table>
+		<tr><th class="masterScoreHeader" colspan="100">Round $round.Number</th></tr>
+		$thead
+#after
+	</table>
+#if( $velocityCount % 4 == 0 )
+</div>
+#end
+#each
+#foreach($team in $round.Teams)
+		<tr><td>$team.Color</td><td>$team.Name</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+#end
+#end
+</body>
+</html>
