@@ -774,6 +774,7 @@ namespace Scoring
             //wd.Print(true);
         }
 
+        #region Printing
         private void btnPrintAll_Click(object sender, EventArgs e)
         {
             //1 - print master schedule
@@ -801,6 +802,23 @@ namespace Scoring
             wd.DisplayPage(HtmlGenerator.GetPageId(HtmlGenerator.PageId.ScoringMaster));
             wd.Print(true);
         }
+
+        private void btnPrintSchedule_Click(object sender, EventArgs e)
+        {
+            //wd.DisplayPage(HtmlGenerator.GetPageId(HtmlGenerator.PageId.RoundFull));
+            //wd.Print(true);
+        }
+
+        private void btnPrintFinal_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnPrintBlank_Click(object sender, EventArgs e)
+        {
+
+        }
+        #endregion
     }
 
     public static class Extensions

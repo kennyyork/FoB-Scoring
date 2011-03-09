@@ -49,6 +49,7 @@
             this.btnPrintAll = new System.Windows.Forms.Button();
             this.scoringInput1 = new Scoring.ScoringInput();
             this.btnPrintRefSheet = new System.Windows.Forms.Button();
+            this.btnScoreSheets = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudRound)).BeginInit();
             this.pnlScoreIn.SuspendLayout();
@@ -198,6 +199,7 @@
             // 
             // gbPrint
             // 
+            this.gbPrint.Controls.Add(this.btnScoreSheets);
             this.gbPrint.Controls.Add(this.btnPrintRefSheet);
             this.gbPrint.Controls.Add(this.btnPrintBlank);
             this.gbPrint.Controls.Add(this.btnPrintFinal);
@@ -205,14 +207,14 @@
             this.gbPrint.Controls.Add(this.btnPrintAll);
             this.gbPrint.Location = new System.Drawing.Point(12, 205);
             this.gbPrint.Name = "gbPrint";
-            this.gbPrint.Size = new System.Drawing.Size(115, 298);
+            this.gbPrint.Size = new System.Drawing.Size(115, 270);
             this.gbPrint.TabIndex = 18;
             this.gbPrint.TabStop = false;
             this.gbPrint.Text = "Printing";
             // 
             // btnPrintBlank
             // 
-            this.btnPrintBlank.Location = new System.Drawing.Point(6, 222);
+            this.btnPrintBlank.Location = new System.Drawing.Point(6, 183);
             this.btnPrintBlank.Name = "btnPrintBlank";
             this.btnPrintBlank.Size = new System.Drawing.Size(103, 35);
             this.btnPrintBlank.TabIndex = 4;
@@ -222,7 +224,7 @@
             // 
             // btnPrintFinal
             // 
-            this.btnPrintFinal.Location = new System.Drawing.Point(6, 181);
+            this.btnPrintFinal.Location = new System.Drawing.Point(6, 224);
             this.btnPrintFinal.Name = "btnPrintFinal";
             this.btnPrintFinal.Size = new System.Drawing.Size(103, 35);
             this.btnPrintFinal.TabIndex = 3;
@@ -265,6 +267,15 @@
             this.btnPrintRefSheet.TabIndex = 5;
             this.btnPrintRefSheet.Text = "Ref Sheets";
             this.btnPrintRefSheet.UseVisualStyleBackColor = true;
+            // 
+            // btnScoreSheets
+            // 
+            this.btnScoreSheets.Location = new System.Drawing.Point(6, 142);
+            this.btnScoreSheets.Name = "btnScoreSheets";
+            this.btnScoreSheets.Size = new System.Drawing.Size(103, 35);
+            this.btnScoreSheets.TabIndex = 6;
+            this.btnScoreSheets.Text = "Score Sheets";
+            this.btnScoreSheets.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
@@ -316,6 +327,7 @@
         private System.Windows.Forms.Button btnPrintBlank;
         private System.Windows.Forms.Button btnWebAll;
         private System.Windows.Forms.Button btnPrintRefSheet;
+        private System.Windows.Forms.Button btnScoreSheets;
     }
 }
 
