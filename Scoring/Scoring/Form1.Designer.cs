@@ -40,16 +40,18 @@
             this.btnCurrentSched = new System.Windows.Forms.Button();
             this.btnPrintScore = new System.Windows.Forms.Button();
             this.gbWeb = new System.Windows.Forms.GroupBox();
-            this.btnWebAll = new System.Windows.Forms.Button();
             this.btnUpdateWeb = new System.Windows.Forms.Button();
             this.gbPrint = new System.Windows.Forms.GroupBox();
+            this.btnScoreSheets = new System.Windows.Forms.Button();
+            this.btnPrintRefSheet = new System.Windows.Forms.Button();
             this.btnPrintBlank = new System.Windows.Forms.Button();
             this.btnPrintFinal = new System.Windows.Forms.Button();
             this.btnPrintSchedule = new System.Windows.Forms.Button();
             this.btnPrintAll = new System.Windows.Forms.Button();
             this.scoringInput1 = new Scoring.ScoringInput();
-            this.btnPrintRefSheet = new System.Windows.Forms.Button();
-            this.btnScoreSheets = new System.Windows.Forms.Button();
+            this.btnWebSched = new System.Windows.Forms.Button();
+            this.btnWebRef = new System.Windows.Forms.Button();
+            this.btnWebScore = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudRound)).BeginInit();
             this.pnlScoreIn.SuspendLayout();
@@ -170,23 +172,16 @@
             // 
             // gbWeb
             // 
-            this.gbWeb.Controls.Add(this.btnWebAll);
+            this.gbWeb.Controls.Add(this.btnWebScore);
+            this.gbWeb.Controls.Add(this.btnWebRef);
+            this.gbWeb.Controls.Add(this.btnWebSched);
             this.gbWeb.Controls.Add(this.btnUpdateWeb);
-            this.gbWeb.Location = new System.Drawing.Point(133, 367);
+            this.gbWeb.Location = new System.Drawing.Point(133, 205);
             this.gbWeb.Name = "gbWeb";
-            this.gbWeb.Size = new System.Drawing.Size(115, 136);
+            this.gbWeb.Size = new System.Drawing.Size(115, 267);
             this.gbWeb.TabIndex = 17;
             this.gbWeb.TabStop = false;
             this.gbWeb.Text = "Webpage";
-            // 
-            // btnWebAll
-            // 
-            this.btnWebAll.Location = new System.Drawing.Point(6, 60);
-            this.btnWebAll.Name = "btnWebAll";
-            this.btnWebAll.Size = new System.Drawing.Size(103, 35);
-            this.btnWebAll.TabIndex = 1;
-            this.btnWebAll.Text = "Update All";
-            this.btnWebAll.UseVisualStyleBackColor = true;
             // 
             // btnUpdateWeb
             // 
@@ -211,6 +206,26 @@
             this.gbPrint.TabIndex = 18;
             this.gbPrint.TabStop = false;
             this.gbPrint.Text = "Printing";
+            // 
+            // btnScoreSheets
+            // 
+            this.btnScoreSheets.Location = new System.Drawing.Point(6, 142);
+            this.btnScoreSheets.Name = "btnScoreSheets";
+            this.btnScoreSheets.Size = new System.Drawing.Size(103, 35);
+            this.btnScoreSheets.TabIndex = 6;
+            this.btnScoreSheets.Text = "Score Sheets";
+            this.btnScoreSheets.UseVisualStyleBackColor = true;
+            this.btnScoreSheets.Click += new System.EventHandler(this.btnScoreSheets_Click);
+            // 
+            // btnPrintRefSheet
+            // 
+            this.btnPrintRefSheet.Location = new System.Drawing.Point(6, 101);
+            this.btnPrintRefSheet.Name = "btnPrintRefSheet";
+            this.btnPrintRefSheet.Size = new System.Drawing.Size(103, 35);
+            this.btnPrintRefSheet.TabIndex = 5;
+            this.btnPrintRefSheet.Text = "Ref Sheets";
+            this.btnPrintRefSheet.UseVisualStyleBackColor = true;
+            this.btnPrintRefSheet.Click += new System.EventHandler(this.btnPrintRefSheet_Click);
             // 
             // btnPrintBlank
             // 
@@ -259,23 +274,32 @@
             this.scoringInput1.Size = new System.Drawing.Size(650, 180);
             this.scoringInput1.TabIndex = 5;
             // 
-            // btnPrintRefSheet
+            // btnWebSched
             // 
-            this.btnPrintRefSheet.Location = new System.Drawing.Point(6, 101);
-            this.btnPrintRefSheet.Name = "btnPrintRefSheet";
-            this.btnPrintRefSheet.Size = new System.Drawing.Size(103, 35);
-            this.btnPrintRefSheet.TabIndex = 5;
-            this.btnPrintRefSheet.Text = "Ref Sheets";
-            this.btnPrintRefSheet.UseVisualStyleBackColor = true;
+            this.btnWebSched.Location = new System.Drawing.Point(6, 60);
+            this.btnWebSched.Name = "btnWebSched";
+            this.btnWebSched.Size = new System.Drawing.Size(103, 35);
+            this.btnWebSched.TabIndex = 7;
+            this.btnWebSched.Text = "Schedule";
+            this.btnWebSched.UseVisualStyleBackColor = true;
             // 
-            // btnScoreSheets
+            // btnWebRef
             // 
-            this.btnScoreSheets.Location = new System.Drawing.Point(6, 142);
-            this.btnScoreSheets.Name = "btnScoreSheets";
-            this.btnScoreSheets.Size = new System.Drawing.Size(103, 35);
-            this.btnScoreSheets.TabIndex = 6;
-            this.btnScoreSheets.Text = "Score Sheets";
-            this.btnScoreSheets.UseVisualStyleBackColor = true;
+            this.btnWebRef.Location = new System.Drawing.Point(6, 101);
+            this.btnWebRef.Name = "btnWebRef";
+            this.btnWebRef.Size = new System.Drawing.Size(103, 35);
+            this.btnWebRef.TabIndex = 7;
+            this.btnWebRef.Text = "Ref Sheets";
+            this.btnWebRef.UseVisualStyleBackColor = true;
+            // 
+            // btnWebScore
+            // 
+            this.btnWebScore.Location = new System.Drawing.Point(6, 142);
+            this.btnWebScore.Name = "btnWebScore";
+            this.btnWebScore.Size = new System.Drawing.Size(103, 35);
+            this.btnWebScore.TabIndex = 7;
+            this.btnWebScore.Text = "Score Sheets";
+            this.btnWebScore.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
@@ -325,9 +349,11 @@
         private System.Windows.Forms.Button btnPrintAll;
         private System.Windows.Forms.Button btnPrintFinal;
         private System.Windows.Forms.Button btnPrintBlank;
-        private System.Windows.Forms.Button btnWebAll;
         private System.Windows.Forms.Button btnPrintRefSheet;
         private System.Windows.Forms.Button btnScoreSheets;
+        private System.Windows.Forms.Button btnWebScore;
+        private System.Windows.Forms.Button btnWebRef;
+        private System.Windows.Forms.Button btnWebSched;
     }
 }
 

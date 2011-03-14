@@ -805,7 +805,8 @@ namespace Scoring
 
         private void btnPrintSchedule_Click(object sender, EventArgs e)
         {
-            //wd.DisplayPage(HtmlGenerator.GetPageId(HtmlGenerator.PageId.RoundFull));
+            wd.Show();
+            wd.DisplayPage(HtmlGenerator.GetPageId(HtmlGenerator.PageId.RoundFull));
             //wd.Print(true);
         }
 
@@ -818,6 +819,32 @@ namespace Scoring
         {
 
         }
+
+        private void btnPrintRefSheet_Click(object sender, EventArgs e)
+        {
+            string path = HtmlGenerator.GetPageId(HtmlGenerator.PageId.ScoringReferee);  
+
+            wd.Show();
+            wd.DisplayPage(string.Format(path, "red"));
+            //wd.Print(true);
+
+            //wd.DisplayPage(string.Format(path, "green"));
+            //wd.Print(true);
+
+            //wd.DisplayPage(string.Format(path, "blue"));
+            //wd.Print(true);
+
+            //wd.DisplayPage(string.Format(path, "yellow"));            
+            //wd.Print(true);
+        }
+
+        private void btnScoreSheets_Click(object sender, EventArgs e)
+        {
+            wd.Show();
+            wd.DisplayPage(HtmlGenerator.GetPageId(HtmlGenerator.PageId.ScoringMaster));
+
+        }
+
         #endregion
     }
 
