@@ -62,8 +62,8 @@ namespace Scoring
                     }
                     else
                     {
-                        //webBrowser.Print();                              
-                        webBrowser.ShowPrintDialog();
+                        webBrowser.Print();                              
+                        //webBrowser.ShowPrintDialog();
                     }
 
                     foreach (var p in backup)

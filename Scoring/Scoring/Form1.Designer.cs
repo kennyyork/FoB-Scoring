@@ -52,6 +52,7 @@
             this.btnPrintSchedule = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.scoringInput1 = new Scoring.ScoringInput();
+            this.btnOpenWeb = new System.Windows.Forms.Button();
             this.gbRounds.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nudRound)).BeginInit();
             this.pnlScoreIn.SuspendLayout();
@@ -305,11 +306,22 @@
             this.scoringInput1.Size = new System.Drawing.Size(650, 180);
             this.scoringInput1.TabIndex = 5;
             // 
+            // btnOpenWeb
+            // 
+            this.btnOpenWeb.Location = new System.Drawing.Point(522, 279);
+            this.btnOpenWeb.Name = "btnOpenWeb";
+            this.btnOpenWeb.Size = new System.Drawing.Size(75, 23);
+            this.btnOpenWeb.TabIndex = 20;
+            this.btnOpenWeb.Text = "Web Display";
+            this.btnOpenWeb.UseVisualStyleBackColor = true;
+            this.btnOpenWeb.Click += new System.EventHandler(this.btnOpenWeb_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(674, 528);
+            this.Controls.Add(this.btnOpenWeb);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.gbPrint);
             this.Controls.Add(this.gbWeb);
@@ -356,6 +368,7 @@
         private System.Windows.Forms.Button btnWebLastRound;
         private System.Windows.Forms.Button btnWebSchedDisplay;
         private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.Button btnOpenWeb;
     }
 }
 

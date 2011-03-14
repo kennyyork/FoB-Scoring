@@ -1,87 +1,80 @@
-﻿body {
-    background: none repeat scroll 0 0 lightBlue;
+body
+{
+	font-family: Verdana;
+	font-weight: normal;
 }
-table {
-    border: 1px solid;
-    border-collapse: collapse;
-    font-family: "Lucida Sans Unicode","Lucida Grande",Sans-Serif;
-    font-size: 12px;
-    margin: 0;
-    text-align: center;
-    width: 100%;
+
+.mainHeader
+{
+	text-align: center;
+	font-size: 20px;
 }
-thead {
-    display: table-header-group;
+
+table
+{
+	width: 95%;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 25px;
+	border-style: none;
+	font-size: 13px;
+	border-collapse: collapse;
+	border-spacing: 0px;
 }
-th {
-    border-bottom: 2px solid;
-    font-size: 14px;
-    font-weight: normal;
-    padding: 15px 10px 10px;
+
+td,th
+{
+	border: 1px black solid;
+	padding: 5px 0px;
+	border-spacing: 0px;
+	text-align: center;
 }
-tr {
-    page-break-inside: avoid;
+
+thead
+{
+	border-bottom: 2px solid black;
 }
-td {
-    border-right: 1px solid;
-    border-top: 1px solid;
-    padding: 10px;
+
+@media print
+{
+	div.scoreSheet
+	{
+		page-break-after: always;
+	}
+	thead
+	{
+		display:table-header-group;
+	}
+	tbody
+	{
+		display:table-row-group;
+	}
 }
-.scoreDisplay {
-    margin-bottom: 3%;
-}
-.scoreDisplay table {
-    font-size: 50%;
-    margin: auto;
-    width: 95%;
-}
-.nextRound table {
-    float: left;
-    width: 35%;
-}
-#round_1 {
-    left: 6%;
-    position: absolute;
-}
-#round_2 {
-    position: absolute;
-    right: 6%;
-}
-.overallDisplayInner {
-    float: left;
-    margin-left: 1%;
-    margin-right: 1%;
-    width: 48%;
-}
-.overallDisplayInner table, tr, td, th {
-    font-size: 20px;
-}
-.overallPlace {
-    width: 1%;
-}
-.overallScore {
-    width: 4%;
-}
-.redCell {
-    background: none repeat scroll 0 0 Red;
-}
-.blueCell {
-    background: none repeat scroll 0 0 blue;
-}
-.greenCell {
-    background: none repeat scroll 0 0 green;
-}
-.yellowCell {
-    background: none repeat scroll 0 0 yellow;
-}
-.mainHeader {
-    left: 5%;
-    margin: 0;
-    width: 8%;
-}
-.mainHeader p {
-    background: none repeat scroll 0 0 yellow;
-    font-size: 20px;
-    left: 5%;
-    text-align: center;
+
+@media screen1
+{
+	body
+	{
+	  background: floralwhite;
+	}
+	td
+	{
+		font-size: 20px;
+	}
+	.redCell
+	{
+	  background: red;
+	}
+	.greenCell
+	{
+	  background: green;
+	}
+	.blueCell
+	{
+		background: cornflowerblue;
+	}
+	.yellowCell
+	{
+		background: yellow;
+	}
 }

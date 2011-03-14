@@ -712,10 +712,9 @@ namespace Scoring
         
         #region Printing        
         private void btnPrintSchedule_Click(object sender, EventArgs e)
-        {
-            wd.Show();
-            wd.DisplayPage(HtmlGenerator.GetPageId(HtmlGenerator.PageId.RoundFull));
-            //wd.Print(true);
+        {            
+            wd.DisplayPage(HtmlGenerator.GetPageId(HtmlGenerator.PageId.RoundFull));            
+            wd.Print(false);            
         }
 
         private void btnPrintRefSheet_Click(object sender, EventArgs e)
@@ -723,36 +722,34 @@ namespace Scoring
             string path = HtmlGenerator.GetPageId(HtmlGenerator.PageId.ScoringReferee);
 
             wd.DisplayPage(string.Format(path, "red"));
-            wd.ShowDialog();
-            //wd.Print(true);
+            wd.Print(false);
 
             wd.DisplayPage(string.Format(path, "green"));
-            wd.ShowDialog();
-            //wd.Print(true);
+            wd.Print(false);
 
             wd.DisplayPage(string.Format(path, "blue"));
-            wd.ShowDialog();
-            //wd.Print(true);
+            wd.Print(false);
 
             wd.DisplayPage(string.Format(path, "yellow"));
-            wd.ShowDialog();
-            //wd.Print(true);
+            wd.Print(false);
         }
 
         private void btnScoreSheets_Click(object sender, EventArgs e)
-        {
-            wd.Show();
+        {            
             wd.DisplayPage(HtmlGenerator.GetPageId(HtmlGenerator.PageId.ScoringMaster));
+            wd.Print(false);
         }
 
         private void btnPrintBlank_Click(object sender, EventArgs e)
         {
-
+            wd.DisplayPage(HtmlGenerator.GetPageId(HtmlGenerator.PageId.ScoringBlank));
+            wd.Print(false);
         }
 
         private void btnPrintFinal_Click(object sender, EventArgs e)
         {
-
+            MessageBox.Show("Final Score not implemented");
+            //wd.DisplayPage(HtmlGenerator.GetPageId(HtmlGenerator.PageId.ScoringBlank));
         }
 
         #endregion
@@ -822,6 +819,11 @@ namespace Scoring
             btnWebAllScores_Click(null, EventArgs.Empty);
         }
         #endregion
+
+        private void btnOpenWeb_Click(object sender, EventArgs e)
+        {
+            wd.Show();
+        }
     }
 
     public static class Extensions

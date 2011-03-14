@@ -23,5 +23,6 @@
 		<tr><td>$team.Color</td><td>$team.Name</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
 #end
 #end
+</div>
 </body>
 </html>

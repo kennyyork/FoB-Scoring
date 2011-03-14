@@ -16,9 +16,8 @@
 517,Booker T HS
 518,D.C. Wolfe
 519,Notasulga HS
-520,Tuaskegee Institude MS
+520,Tuaskegee Institute
 521,Monroeville Jr HS
 522,Francis Marion HS
-523,Handley 
 524,McIntosh HS
 525,Camden S.A.T

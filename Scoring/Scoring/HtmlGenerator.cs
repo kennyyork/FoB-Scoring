@@ -44,6 +44,7 @@ namespace Scoring
             TeamRounds,
             ScoringReferee,
             ScoringMaster,
+            ScoringBlank,
         }
 
         private static Dictionary<PageId, string> fileMap = new Dictionary<PageId, string>
@@ -57,6 +58,7 @@ namespace Scoring
             { PageId.TeamRounds, "team_{0}.html" },
             { PageId.ScoringReferee, "ref_field_{0}.html" },
             { PageId.ScoringMaster, "ref_master.html" },
+            { PageId.ScoringBlank, "ref_master_blank.html" },
         };
 
         public static string GetPageId(PageId id) { return fileMap[id]; }
