@@ -47,20 +47,29 @@ namespace Scoring
             {
                 if (key != null)
                 {
-                    string old_footer = (string)key.GetValue("footer");
-                    string old_header = (string)key.GetValue("header");
+                    Dictionary<string, object> backup = key.GetValueNames().ToDictionary(s => s, s => key.GetValue(s));
+
                     key.SetValue("footer", "");
                     key.SetValue("header", "");
+                    key.SetValue("margin_left", "0.25");
+                    key.SetValue("margin_right", "0.25");
+                    key.SetValue("margin_bottom", "0.25");
+                    key.SetValue("header_top", "0.25");
+
                     if (preview)
                     {
                         webBrowser.ShowPrintPreviewDialog();
                     }
                     else
                     {
-                        webBrowser.Print();                              
+                        //webBrowser.Print();                              
+                        webBrowser.ShowPrintDialog();
                     }
-                    key.SetValue("footer", old_footer);
-                    key.SetValue("header", old_header);
+
+                    foreach (var p in backup)
+                    {
+                        key.SetValue(p.Key, p.Value);
+                    }
                 }
             }  
         }

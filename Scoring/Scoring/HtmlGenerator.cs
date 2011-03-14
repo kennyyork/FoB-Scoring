@@ -257,7 +257,7 @@ namespace Scoring
 
         public static void RefereeFieldSheets(IEnumerable<Round> rounds)
         {
-            Template t = velocity.GetTemplate(@"templates\ref_master_sheet.vm");
+            Template t = velocity.GetTemplate(@"templates\ref_field_sheet.vm");
             VelocityContext c = new VelocityContext(baseContext);
 
             int[] colors = new int[] { 0, 1, 2, 3 };

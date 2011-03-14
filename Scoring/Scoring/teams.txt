@@ -1,23 +1,24 @@
-﻿500,Davidson 0
-501,Davidson 1
-502,Davidson 2
-503,Davidson 3
-504,Davidson 4
-505,Davidson 5
-506,Davidson 6
-507,Davidson 7
-508,Davidson 8
-509,Davidson 9
-510,Davidson 10
-511,Davidson 11
-512,Davidson 12
-513,Davidson 13
-514,Davidson 14
-515,Davidson 15
-516,Davidson 16
-517,Davidson 17
-518,Davidson 18
-519,Davidson 19
-520,Davidson 20
-521,Davidson 21
-522,Davidson 22
+﻿501,Bullock Co. CTC
+502,South Higlands MS
+503,Greenville HS
+504,Clay Co. HS
+505,Central H&T
+506,Central MS
+507,Dallas Co. HS
+508,Keith MS
+509,Martin MS
+510,Selma HS
+511,Selma CHAT
+512,Southside HS
+513,Tipton-Durant MS
+514,Carver MS/Greene HS
+516,Paramount Jr. High
+517,Booker T HS
+518,D.C. Wolfe
+519,Notasulga HS
+520,Tuaskegee Institude MS
+521,Monroeville Jr HS
+522,Francis Marion HS
+523,Handley 
+524,McIntosh HS
+525,Camden S.A.T
