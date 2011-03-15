@@ -280,7 +280,7 @@ namespace Scoring
         {
             Template template = velocity.GetTemplate(@"templates\ref_master_sheet.vm");
             VelocityContext c = new VelocityContext(baseContext);
-
+            
             var rnds = from r in rounds orderby r.Number select new { Number = r.Number, Teams = from t in r.Teams select new { Name = t.Name, Color = r.TeamColor(t) } };
             c.Put("rounds", rnds);
 

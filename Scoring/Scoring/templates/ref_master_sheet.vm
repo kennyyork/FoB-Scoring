@@ -1,4 +1,5 @@
 ﻿#set( $thead = "<tr><th>Color</th><th>Team</th><th>Markers</th><th>Good Cars</th><th>Bad Cars</th><th>Good Logs</th><th>Bad Logs</th><th>Good Coal</th><th>Bad Coal</th><th>Multiplier</th></tr>" )
+#set( $sections = 5 )
 <html>
 <head>
 	<script type="text/javascript" src="/$script"></script>
@@ -7,7 +8,7 @@
 <body onload="onLoad()">
 #foreach($round in $rounds)
 #before
-#if( $velocityCount % 4 == 1 )
+#if( $velocityCount % $sections == 1 )
 <div class="scoreSheet">
 #end
 	<table>
@@ -15,7 +16,7 @@
 		$thead
 #after
 	</table>
-#if( $velocityCount % 4 == 0 )
+#if( $velocityCount % $sections == 0 )
 </div>
 #end
 #each

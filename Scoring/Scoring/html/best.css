@@ -1,3 +1,6 @@
+/* Edited with EditCSS */
+/**** LINK-tag style sheet best.css ****/
+
 body
 {
 	font-family: Verdana;
@@ -51,7 +54,7 @@ thead
 	}
 }
 
-@media screen1
+@media screen
 {
 	body
 	{
@@ -77,4 +80,29 @@ thead
 	{
 		background: yellow;
 	}
+
+	.nextRound table
+	{
+		position: absolute;
+		width: 35%;
+	}
+	#round_1
+	{
+		left: 10%;
+		float: left;
+	}
+
+	#round_2
+	{
+		right:10%;
+	}
+	
+	.overallDisplayInner
+	{
+		margin: auto;
+		width: 50%;
+		float: left;
+	}
 }
+
+
